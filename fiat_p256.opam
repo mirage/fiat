@@ -1,0 +1,25 @@
+opam-version: "2.0"
+maintainer: "Etienne Millon <me@emillon.org>"
+authors: [
+    "Etienne Millon <me@emillon.org>"
+    "Andres Erbsen <andreser@mit.edu>"
+    "Google Inc."
+    "Jade Philipoom <jadep@mit.edu> <jade.philipoom@gmail.com>"
+    "Massachusetts Institute of Technology"
+]
+tags: ["org:mirage"]
+build: [
+ ["dune" "subst"] {pinned}
+ ["dune" "build" "-p" name "-j" jobs]
+ ["dune" "runtest" "-p" name] {with-test}
+]
+depends: [
+]
+synopsis: "Primitives for Elliptic Curve Cryptography taken from Fiat"
+description: """
+This is an implementation of the ECDH over P-256 key exchange algorithm, using
+code from Fiat (<https://github.com/mit-plv/fiat-crypto>).
+
+Cryptographic primitives should not be used in end applications, they are better
+used as part of a cryptographic library.
+"""
