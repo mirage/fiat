@@ -1,8 +1,4 @@
-(executable
+(test
  (name test)
  (libraries alcotest fiat_p256 wycheproof str)
 )
-
-(alias
- (name test-wycheproof)
- (action (run ./test.exe)))
