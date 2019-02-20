@@ -9,8 +9,7 @@ let at_infinity () =
   let f_z = Fe.create () in
   {f_x; f_y; f_z}
 
-let of_hex h =
-  let cs = Hex.to_cstruct h in
+let of_cstruct cs =
   match (Cstruct.get_uint8 cs 0, Cstruct.len cs) with
   | 0x00, 1 ->
       Some (at_infinity ())
@@ -27,6 +26,9 @@ let of_hex h =
       Some {f_x; f_y; f_z}
   | _ ->
       None
+
+let of_hex h =
+  of_cstruct (Hex.to_cstruct h)
 
 let of_hex_exn h =
   match of_hex h with

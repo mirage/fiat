@@ -40,6 +40,10 @@ type point = Point.t
 
 let point_of_hex = Point.of_hex
 
+let point_of_cs = Point.of_cstruct
+
 type scalar = Scalar.t
 
 let scalar_of_hex = Scalar.of_hex
+
+let scalar_of_cs = Scalar.of_cstruct
