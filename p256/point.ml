@@ -68,6 +68,17 @@ let pp fmt p =
       Format.fprintf fmt "04%a%a" Cstruct_util.pp_hex_le x
         Cstruct_util.pp_hex_le y
 
+let to_cstruct p =
+  match to_affine p with
+  | None -> Cstruct.create 1
+  | Some (x, y) ->
+    let four = Cstruct.create 1 in
+    Cstruct.set_uint8 four 0 4 ;
+    let rev_x = Cstruct_util.rev x
+    and rev_y = Cstruct_util.rev y
+    in
+    Cstruct.concat [ four ; rev_x ; rev_y ]
+
 let double (ctx : Context.t) p =
   let x_out = Fe.create () in
   let y_out = Fe.create () in

@@ -4,6 +4,8 @@ val point_of_hex : Hex.t -> point option
 
 val point_of_cs : Cstruct.t -> point option
 
+val point_to_cs : point -> Cstruct.t
+
 type scalar
 
 val scalar_of_hex : Hex.t -> scalar option
