@@ -60,14 +60,6 @@ let to_affine p =
     Fe.to_bytes out_y y;
     Some (out_x, out_y)
 
-let pp fmt p =
-  match to_affine p with
-  | None ->
-      Format.fprintf fmt "00"
-  | Some (x, y) ->
-      Format.fprintf fmt "04%a%a" Cstruct_util.pp_hex_le x
-        Cstruct_util.pp_hex_le y
-
 let to_cstruct p =
   match to_affine p with
   | None -> Cstruct.create 1
@@ -78,6 +70,8 @@ let to_cstruct p =
     and rev_y = Cstruct_util.rev y
     in
     Cstruct.concat [ four ; rev_x ; rev_y ]
+
+let pp fmt p = Cstruct.hexdump_pp fmt (to_cstruct p)
 
 let double (ctx : Context.t) p =
   let x_out = Fe.create () in
