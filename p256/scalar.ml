@@ -26,8 +26,7 @@ let pad ~total_len cs =
   | pad_len ->
       Some (Cstruct.append cs (Cstruct.create pad_len))
 
-let of_hex h =
-  let cs = Hex.to_cstruct h in
+let of_cstruct cs =
   if Cstruct.len cs = 0 then None
   else
     let stripped = strip_leading_zeroes cs in
@@ -36,6 +35,10 @@ let of_hex h =
         Some (Scalar padded)
     | None ->
         None
+
+let of_hex h =
+  let cs = Hex.to_cstruct h in
+  of_cstruct cs
 
 let pp_opt pp fmt = function
   | None ->

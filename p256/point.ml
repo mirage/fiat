@@ -9,8 +9,7 @@ let at_infinity () =
   let f_z = Fe.create () in
   {f_x; f_y; f_z}
 
-let of_hex h =
-  let cs = Hex.to_cstruct h in
+let of_cstruct cs =
   match (Cstruct.get_uint8 cs 0, Cstruct.len cs) with
   | 0x00, 1 ->
       Some (at_infinity ())
@@ -27,6 +26,9 @@ let of_hex h =
       Some {f_x; f_y; f_z}
   | _ ->
       None
+
+let of_hex h =
+  of_cstruct (Hex.to_cstruct h)
 
 let of_hex_exn h =
   match of_hex h with
@@ -58,13 +60,18 @@ let to_affine p =
     Fe.to_bytes out_y y;
     Some (out_x, out_y)
 
-let pp fmt p =
+let to_cstruct p =
   match to_affine p with
-  | None ->
-      Format.fprintf fmt "00"
+  | None -> Cstruct.create 1
   | Some (x, y) ->
-      Format.fprintf fmt "04%a%a" Cstruct_util.pp_hex_le x
-        Cstruct_util.pp_hex_le y
+    let four = Cstruct.create 1 in
+    Cstruct.set_uint8 four 0 4 ;
+    let rev_x = Cstruct_util.rev x
+    and rev_y = Cstruct_util.rev y
+    in
+    Cstruct.concat [ four ; rev_x ; rev_y ]
+
+let pp fmt p = Cstruct_util.pp_hex_le fmt (Cstruct_util.rev (to_cstruct p))
 
 let double (ctx : Context.t) p =
   let x_out = Fe.create () in
