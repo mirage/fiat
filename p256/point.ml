@@ -71,7 +71,7 @@ let to_cstruct p =
     in
     Cstruct.concat [ four ; rev_x ; rev_y ]
 
-let pp fmt p = Cstruct_util.pp_hex_le fmt (Cstruct_util.rev p)
+let pp fmt p = Cstruct_util.pp_hex_le fmt (Cstruct_util.rev (to_cstruct p))
 
 let double (ctx : Context.t) p =
   let x_out = Fe.create () in
