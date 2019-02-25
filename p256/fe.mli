@@ -1,23 +1,49 @@
+(** Field elements *)
+
+(** A field element. This corresponds to a mutable chunk of memory.
+    Most operations are done in Montgomery form. This means that the internal
+    value is multiplied by a constant [R = 2**256].
+
+    @see <https://en.wikipedia.org/wiki/Montgomery_modular_multiplication>
+*)
 type t
 
 val create : unit -> t
+(** Allocate a new element, corresponding to zero. *)
 
 val one : unit -> t
-
-val to_montgomery : t -> unit
-
-val mul : t -> t -> t -> unit
-
-val copy : t -> t -> unit
+(** Allocate a new element, corresponding to one. *)
 
 val from_bytes : t -> Cstruct.t -> unit
-
-val nz : t -> bool
-
-val sqr : t -> t -> unit
-
-val from_montgomery : t -> unit
+(** [from_bytes dst src] deserializes a field element in the Montgomery domain
+    from bytes in little-endian order. *)
 
 val to_bytes : Cstruct.t -> t -> unit
+(** [to_bytes dst src] serializes a field element in the Montgomery domain to
+    bytes in little-endian order. *)
+
+val from_montgomery : t -> unit
+(** Translate a field element out of the Montgomery domain.
+    That is to say, it divides by [R] in place. *)
+
+val to_montgomery : t -> unit
+(** Convert a field element into the Montgomery domain.
+    That is to say, it multiplies by [R] in place. *)
+
+val copy : t -> t -> unit
+(** [copy dst src] sets [dst] to [src]. *)
+
+val mul : t -> t -> t -> unit
+(** [mul dst a b] multiplies [a] and [b] (in the Montgomery domain) and stores
+    the result in [dst]. *)
+
+val nz : t -> bool
+(** [nz n] returns [true] if [n] is non-zero. *)
+
+val sqr : t -> t -> unit
+(** [sqr dst src] squares [src] in the Montgomery domain and stores the result
+    in [dst]. *)
 
 val inv : t -> t -> unit
+(** [inv dst src] computes the modular inverse of [src] and stores the result in
+    [dst]. *)
