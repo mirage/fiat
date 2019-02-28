@@ -164,9 +164,7 @@ CAMLprim value fiat_p256_caml_from_montgomery(value x)
 CAMLprim value fiat_p256_caml_nz(value x)
 {
 	CAMLparam1(x);
-	limb_t ret;
-	fiat_p256_nonzero(&ret, Caml_ba_data_val(x));
-	CAMLreturn(Val_bool(ret));
+	CAMLreturn(Val_bool(fe_nz(Caml_ba_data_val(x))));
 }
 
 CAMLprim value fiat_p256_caml_cmovznz(value out, value cond, value z, value nz)
