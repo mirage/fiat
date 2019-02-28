@@ -13,9 +13,6 @@ let to_montgomery x = mul x x r_squared
 
 let copy dst src = Bigarray.Array1.blit src dst
 
-external cmovznz : t -> bool -> t -> t -> unit = "fiat_p256_caml_cmovznz"
-  [@@noalloc]
-
 external from_bytes_buf :
   t -> Cstruct.buffer -> unit
   = "fiat_p256_caml_from_bytes"
@@ -48,9 +45,5 @@ external to_bytes_buf :
   [@@noalloc]
 
 let to_bytes cs fe = to_bytes_buf (checked_buffer cs) fe
-
-external add : t -> t -> t -> unit = "fiat_p256_caml_add" [@@noalloc]
-
-external sub : t -> t -> t -> unit = "fiat_p256_caml_sub" [@@noalloc]
 
 external inv : t -> t -> unit = "fiat_p256_caml_inv" [@@noalloc]

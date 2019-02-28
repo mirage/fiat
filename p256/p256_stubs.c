@@ -297,20 +297,6 @@ CAMLprim value fiat_p256_caml_mul(value out, value a, value b)
 	CAMLreturn(Val_unit);
 }
 
-CAMLprim value fiat_p256_caml_add(value out, value a, value b)
-{
-	CAMLparam3(out, a, b);
-	fiat_p256_add(Caml_ba_data_val(out), Caml_ba_data_val(a), Caml_ba_data_val(b));
-	CAMLreturn(Val_unit);
-}
-
-CAMLprim value fiat_p256_caml_sub(value out, value a, value b)
-{
-	CAMLparam3(out, a, b);
-	fiat_p256_sub(Caml_ba_data_val(out), Caml_ba_data_val(a), Caml_ba_data_val(b));
-	CAMLreturn(Val_unit);
-}
-
 CAMLprim value fiat_p256_caml_from_bytes(value out, value in)
 {
 	CAMLparam2(out, in);
@@ -345,18 +331,6 @@ CAMLprim value fiat_p256_caml_nz(value x)
 {
 	CAMLparam1(x);
 	CAMLreturn(Val_bool(fe_nz(Caml_ba_data_val(x))));
-}
-
-CAMLprim value fiat_p256_caml_cmovznz(value out, value cond, value z, value nz)
-{
-	CAMLparam4(out, cond, z, nz);
-	fiat_p256_selectznz(
-		Caml_ba_data_val(out),
-		Bool_val(cond),
-		Caml_ba_data_val(z),
-		Caml_ba_data_val(nz)
-	);
-	CAMLreturn(Val_unit);
 }
 
 CAMLprim value fiat_p256_caml_inv(value out, value in)
