@@ -27,8 +27,7 @@ let of_cstruct cs =
   | _ ->
       None
 
-let of_hex h =
-  of_cstruct (Hex.to_cstruct h)
+let of_hex h = of_cstruct (Hex.to_cstruct h)
 
 let of_hex_exn h =
   match of_hex h with
@@ -62,68 +61,25 @@ let to_affine p =
 
 let to_cstruct p =
   match to_affine p with
-  | None -> Cstruct.create 1
+  | None ->
+      Cstruct.create 1
   | Some (x, y) ->
-    let four = Cstruct.create 1 in
-    Cstruct.set_uint8 four 0 4 ;
-    let rev_x = Cstruct_util.rev x
-    and rev_y = Cstruct_util.rev y
-    in
-    Cstruct.concat [ four ; rev_x ; rev_y ]
+      let four = Cstruct.create 1 in
+      Cstruct.set_uint8 four 0 4;
+      let rev_x = Cstruct_util.rev x and rev_y = Cstruct_util.rev y in
+      Cstruct.concat [four; rev_x; rev_y]
 
 let pp fmt p = Cstruct_util.pp_hex_le fmt (Cstruct_util.rev (to_cstruct p))
 
-let double (ctx : Context.t) p =
-  let x_out = Fe.create () in
-  let y_out = Fe.create () in
-  let z_out = Fe.create () in
-  let delta = ctx.delta in
-  let gamma = ctx.gamma in
-  let beta = ctx.beta in
-  let ftmp = ctx.ftmp in
-  let ftmp2 = ctx.ftmp2 in
-  let tmptmp = ctx.tmptmp in
-  let alpha = ctx.alpha in
-  let fourbeta = ctx.fourbeta in
-  (* delta = z^2 *)
-  let z_in = p.f_z in
-  Fe.sqr delta z_in;
-  (* gamma = y^2 *)
-  let y_in = p.f_y in
-  Fe.sqr gamma y_in;
-  (* beta = x*gamma *)
-  let x_in = p.f_x in
-  Fe.mul beta x_in gamma;
-  (* alpha = 3*(x-delta)*(x+delta) *)
-  Fe.sub ftmp x_in delta;
-  Fe.add ftmp2 x_in delta;
-  Fe.add tmptmp ftmp2 ftmp2;
-  Fe.add ftmp2 ftmp2 tmptmp;
-  Fe.mul alpha ftmp ftmp2;
-  (* x' = alpha^2 - 8*beta *)
-  Fe.sqr x_out alpha;
-  Fe.add fourbeta beta beta;
-  Fe.add fourbeta fourbeta fourbeta;
-  Fe.add tmptmp fourbeta fourbeta;
-  Fe.sub x_out x_out tmptmp;
-  (* z' = (y + z)^2 - gamma - delta *)
-  Fe.add delta gamma delta;
-  Fe.add ftmp y_in z_in;
-  Fe.sqr z_out ftmp;
-  Fe.sub z_out z_out delta;
-  (* y' = alpha*(4*beta - x') - 8*gamma^2 *)
-  Fe.sub y_out fourbeta x_out;
-  Fe.add gamma gamma gamma;
-  Fe.sqr gamma gamma;
-  Fe.mul y_out alpha y_out;
-  Fe.add gamma gamma gamma;
-  Fe.sub y_out y_out gamma;
-  {f_x = x_out; f_y = y_out; f_z = z_out}
+external double_c : t -> t -> unit = "fiat_p256_caml_point_double" [@@noalloc]
+
+let double p =
+  let out = {f_x = Fe.create (); f_y = Fe.create (); f_z = Fe.create ()} in
+  double_c out p; out
 
 let%expect_test "double" =
-  let ctx = Context.create () in
   let print_point = Format.printf "%a\n" pp in
-  let test p = print_point @@ double ctx p in
+  let test p = print_point @@ double p in
   let p =
     of_hex_exn
       (`Hex
@@ -210,7 +166,7 @@ let add (ctx : Context.t) fe_p fe_q =
   Fe.sub r s2 s1;
   Fe.add r r r;
   let yneq = Fe.nz r in
-  if (not xneq) && (not yneq) && z1nz && z2nz then double ctx fe_p
+  if (not xneq) && (not yneq) && z1nz && z2nz then double fe_p
   else
     (* I = (2h)**2 *)
     let i = ctx.i in
@@ -308,7 +264,7 @@ let%expect_test "double vs add" =
   print_point @@ add ctx p @@ add ctx p @@ add ctx p p;
   [%expect
     {| 04e2534a3532d08fbba02dde659ee62bd0031fe2db785596ef509302446b030852e0f1575a4c633cc719dfee5fda862d764efc96c3f30ee0055c42c23f184ed8c6 |}];
-  print_point @@ double ctx (double ctx p);
+  print_point @@ double @@ double p;
   [%expect
     {| 04e2534a3532d08fbba02dde659ee62bd0031fe2db785596ef509302446b030852e0f1575a4c633cc719dfee5fda862d764efc96c3f30ee0055c42c23f184ed8c6 |}]
 

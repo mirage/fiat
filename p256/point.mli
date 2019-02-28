@@ -4,7 +4,7 @@ val at_infinity : unit -> t
 
 val add : Context.t -> t -> t -> t
 
-val double : Context.t -> t -> t
+val double : t -> t
 
 val of_cstruct : Cstruct.t -> t option
 

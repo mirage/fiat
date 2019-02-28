@@ -5,10 +5,10 @@ let scalar_mult d p =
   for i = 255 downto 0 do
     if Scalar.bit_at d i then (
       r0 := Point.add ctx !r0 !r1;
-      r1 := Point.double ctx !r1 )
+      r1 := Point.double !r1 )
     else (
       r1 := Point.add ctx !r0 !r1;
-      r0 := Point.double ctx !r0 )
+      r0 := Point.double !r0 )
   done;
   !r0
 
