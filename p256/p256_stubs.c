@@ -176,6 +176,120 @@ static void point_double(fe x_out, fe y_out, fe z_out,
   fe_sub(y_out, y_out, gamma);
 }
 
+// point_add calcuates (x1, y1, z1) + (x2, y2, z2)
+//
+// The method is taken from:
+//   http://hyperelliptic.org/EFD/g1p/auto-shortw-jacobian-3.html#addition-add-2007-bl,
+// adapted for mixed addition (z2 = 1, or z2 = 0 for the point at infinity).
+//
+// Coq transcription and correctness proof:
+// <https://github.com/mit-plv/fiat-crypto/blob/79f8b5f39ed609339f0233098dee1a3c4e6b3080/src/Curves/Weierstrass/Jacobian.v#L135>
+// <https://github.com/mit-plv/fiat-crypto/blob/79f8b5f39ed609339f0233098dee1a3c4e6b3080/src/Curves/Weierstrass/Jacobian.v#L205>
+//
+// This function includes a branch for checking whether the two input points
+// are equal, (while not equal to the point at infinity). This case never
+// happens during single point multiplication, so there is no timing leak for
+// ECDH or ECDSA signing.
+static void point_add(fe x3, fe y3, fe z3, const fe x1,
+                      const fe y1, const fe z1, const int mixed,
+                      const fe x2, const fe y2, const fe z2) {
+  fe x_out, y_out, z_out;
+  limb_t z1nz = fe_nz(z1);
+  limb_t z2nz = fe_nz(z2);
+
+  // z1z1 = z1z1 = z1**2
+  fe z1z1; fe_sqr(z1z1, z1);
+
+  fe u1, s1, two_z1z2;
+  if (!mixed) {
+    // z2z2 = z2**2
+    fe z2z2; fe_sqr(z2z2, z2);
+
+    // u1 = x1*z2z2
+    fe_mul(u1, x1, z2z2);
+
+    // two_z1z2 = (z1 + z2)**2 - (z1z1 + z2z2) = 2z1z2
+    fe_add(two_z1z2, z1, z2);
+    fe_sqr(two_z1z2, two_z1z2);
+    fe_sub(two_z1z2, two_z1z2, z1z1);
+    fe_sub(two_z1z2, two_z1z2, z2z2);
+
+    // s1 = y1 * z2**3
+    fe_mul(s1, z2, z2z2);
+    fe_mul(s1, s1, y1);
+  } else {
+    // We'll assume z2 = 1 (special case z2 = 0 is handled later).
+
+    // u1 = x1*z2z2
+    fe_copy(u1, x1);
+    // two_z1z2 = 2z1z2
+    fe_add(two_z1z2, z1, z1);
+    // s1 = y1 * z2**3
+    fe_copy(s1, y1);
+  }
+
+  // u2 = x2*z1z1
+  fe u2; fe_mul(u2, x2, z1z1);
+
+  // h = u2 - u1
+  fe h; fe_sub(h, u2, u1);
+
+  limb_t xneq = fe_nz(h);
+
+  // z_out = two_z1z2 * h
+  fe_mul(z_out, h, two_z1z2);
+
+  // z1z1z1 = z1 * z1z1
+  fe z1z1z1; fe_mul(z1z1z1, z1, z1z1);
+
+  // s2 = y2 * z1**3
+  fe s2; fe_mul(s2, y2, z1z1z1);
+
+  // r = (s2 - s1)*2
+  fe r;
+  fe_sub(r, s2, s1);
+  fe_add(r, r, r);
+
+  limb_t yneq = fe_nz(r);
+
+  if (!xneq && !yneq && z1nz && z2nz) {
+    point_double(x3, y3, z3, x1, y1, z1);
+    return;
+  }
+
+  // I = (2h)**2
+  fe i;
+  fe_add(i, h, h);
+  fe_sqr(i, i);
+
+  // J = h * I
+  fe j; fe_mul(j, h, i);
+
+  // V = U1 * I
+  fe v; fe_mul(v, u1, i);
+
+  // x_out = r**2 - J - 2V
+  fe_sqr(x_out, r);
+  fe_sub(x_out, x_out, j);
+  fe_sub(x_out, x_out, v);
+  fe_sub(x_out, x_out, v);
+
+  // y_out = r(V-x_out) - 2 * s1 * J
+  fe_sub(y_out, v, x_out);
+  fe_mul(y_out, y_out, r);
+  fe s1j;
+  fe_mul(s1j, s1, j);
+  fe_sub(y_out, y_out, s1j);
+  fe_sub(y_out, y_out, s1j);
+
+  fe_cmovznz(x_out, z1nz, x2, x_out);
+  fe_cmovznz(x3, z2nz, x1, x_out);
+  fe_cmovznz(y_out, z1nz, y2, y_out);
+  fe_cmovznz(y3, z2nz, y1, y_out);
+  fe_cmovznz(z_out, z1nz, z2, z_out);
+  fe_cmovznz(z3, z2nz, z1, z_out);
+}
+
 CAMLprim value fiat_p256_caml_mul(value out, value a, value b)
 {
 	CAMLparam3(out, a, b);
@@ -262,6 +376,24 @@ CAMLprim value fiat_p256_caml_point_double(value out, value in)
 		Caml_ba_data_val(Field(in, 0)),
 		Caml_ba_data_val(Field(in, 1)),
 		Caml_ba_data_val(Field(in, 2))
+	);
+	CAMLreturn(Val_unit);
+}
+
+CAMLprim value fiat_p256_caml_point_add(value out, value p, value q)
+{
+	CAMLparam3(out, p, q);
+	point_add(
+		Caml_ba_data_val(Field(out, 0)),
+		Caml_ba_data_val(Field(out, 1)),
+		Caml_ba_data_val(Field(out, 2)),
+		Caml_ba_data_val(Field(p, 0)),
+		Caml_ba_data_val(Field(p, 1)),
+		Caml_ba_data_val(Field(p, 2)),
+		0,
+		Caml_ba_data_val(Field(q, 0)),
+		Caml_ba_data_val(Field(q, 1)),
+		Caml_ba_data_val(Field(q, 2))
 	);
 	CAMLreturn(Val_unit);
 }

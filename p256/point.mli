@@ -2,7 +2,7 @@ type t
 
 val at_infinity : unit -> t
 
-val add : Context.t -> t -> t -> t
+val add : t -> t -> t
 
 val double : t -> t
 
