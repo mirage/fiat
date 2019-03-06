@@ -45,6 +45,4 @@ type test_file =
   ; testGroups : test_group list }
 [@@deriving show]
 
-val x25519 : test_file
-
 val secp256r1 : test_file

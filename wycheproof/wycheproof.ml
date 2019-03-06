@@ -121,6 +121,4 @@ let get_json = function
 let load_tests s =
   Yojson.Safe.from_string s |> [%of_yojson: test_file] |> get_json
 
-let x25519 = load_tests [%blob "x25519_test.json"]
-
 let secp256r1 = load_tests [%blob "ecdh_secp256r1_test.json"]
