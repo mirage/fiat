@@ -118,7 +118,5 @@ let get_json = function
   | Error s ->
       failwith s
 
-let load_tests s =
-  Yojson.Safe.from_string s |> [%of_yojson: test_file] |> get_json
-
-let secp256r1 = load_tests [%blob "ecdh_secp256r1_test.json"]
+let load_file_exn path =
+  Yojson.Safe.from_file path |> [%of_yojson: test_file] |> get_json

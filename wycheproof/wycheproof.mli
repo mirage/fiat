@@ -45,4 +45,4 @@ type test_file =
   ; testGroups : test_group list }
 [@@deriving show]
 
-val secp256r1 : test_file
+val load_file_exn : string -> test_file

@@ -65,13 +65,14 @@ let make_test {tcId; comment; private_; public; shared; result; flags; _} =
            ignored_flags ->
       []
   | Valid
-  | Acceptable ->
+   |Acceptable ->
       [(name, `Quick, test_valid ~private_ ~public ~expected:shared)]
   | Invalid ->
       []
 
 let tests =
-  secp256r1.testGroups
+  let data = load_file_exn "ecdh_secp256r1_test.json" in
+  data.testGroups
   |> List.map (fun group -> List.map make_test group.tests |> List.concat)
   |> List.concat
 
