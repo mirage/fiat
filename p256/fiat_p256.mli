@@ -37,3 +37,5 @@ val dh : scalar:scalar -> point:point -> Cstruct.t
 val public : scalar -> point
 (** Compute the public key corresponding to a given private key. Internally,
     this multiplies the generator by the scalar. *)
+
+val verify : Cstruct.t -> point -> r:Cstruct.t -> s:Cstruct.t -> bool
