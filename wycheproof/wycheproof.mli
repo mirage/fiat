@@ -10,14 +10,6 @@ type test_result =
   | Invalid
 [@@deriving show]
 
-type flag [@@deriving show]
-
-val invalid_asn : flag
-
-val compressed_point : flag
-
-val unnamed_curve : flag
-
 type test =
   { tcId : int
   ; comment : string
@@ -26,8 +18,10 @@ type test =
   ; private_ : hex
   ; shared : hex
   ; result : test_result
-  ; flags : flag list }
+  ; flags : string list }
 [@@deriving show]
+
+val has_ignored_flag : test -> ignored_flags:string list -> bool
 
 type test_group =
   { curve : json

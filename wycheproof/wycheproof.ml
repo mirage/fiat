@@ -34,57 +34,6 @@ let test_result_of_yojson = function
   | _ ->
       Error "test_result"
 
-type flag =
-  | Twist
-  | LowOrderPublic
-  | SmallPublicKey
-  | CompressedPoint
-  | AddSubChain
-  | InvalidPublic
-  | WrongOrder
-  | UnnamedCurve
-  | UnusedParam
-  | ModifiedPrime
-  | WeakPublicKey
-  | InvalidAsn
-[@@deriving show]
-
-let invalid_asn = InvalidAsn
-
-let compressed_point = CompressedPoint
-
-let unnamed_curve = UnnamedCurve
-
-let flag_of_yojson = function
-  | `String "LowOrderPublic" ->
-      Ok LowOrderPublic
-  | `String "Twist" ->
-      Ok Twist
-  | `String "Small public key" ->
-      Ok SmallPublicKey
-  | `String "CompressedPoint" ->
-      Ok CompressedPoint
-  | `String "AddSubChain" ->
-      Ok AddSubChain
-  | `String "InvalidPublic" ->
-      Ok InvalidPublic
-  | `String "WrongOrder" ->
-      Ok WrongOrder
-  | `String "UnnamedCurve" ->
-      Ok UnnamedCurve
-  | `String "UnusedParam" ->
-      Ok UnusedParam
-  | `String "ModifiedPrime" ->
-      Ok ModifiedPrime
-  | `String "WeakPublicKey" ->
-      Ok WeakPublicKey
-  | `String "InvalidAsn" ->
-      Ok InvalidAsn
-  | `String s ->
-      Error ("Unknown flag: " ^ s)
-  | _ ->
-      Error "flag_of_yojson"
-
 type test =
   { tcId : int
   ; comment : string
@@ -93,8 +42,13 @@ type test =
   ; private_ : hex [@yojson.key "private"]
   ; shared : hex
   ; result : test_result
-  ; flags : flag list }
+  ; flags : string list }
 [@@deriving of_yojson, show]
+
+let has_ignored_flag test ~ignored_flags =
+  List.exists
+    (fun ignored_flag -> List.mem ignored_flag test.flags)
+    ignored_flags
 
 type test_group =
   { curve : json
