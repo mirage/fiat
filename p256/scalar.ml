@@ -30,7 +30,7 @@ let of_cstruct cs =
   if Cstruct.len cs = 0 then None
   else
     let stripped = strip_leading_zeroes cs in
-    match pad ~total_len:32 (Cstruct_util.rev stripped) with
+    match pad ~total_len:32 (Cstruct.rev stripped) with
     | Some padded ->
         Some (Scalar padded)
     | None ->
