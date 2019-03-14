@@ -43,21 +43,16 @@ let parse_scalar s =
     (Fiat_p256.scalar_of_hex (Hex.of_string s))
 
 type test =
-  { name : string
-  ; point : Fiat_p256.point
+  { point : Fiat_p256.point
   ; scalar : Fiat_p256.scalar
   ; expected : string }
 
-let interpret_test {name; point; scalar; expected} =
-  let run () =
-    let got = Cstruct.to_string (Fiat_p256.dh ~scalar ~point) in
-    Alcotest.check hex __LOC__ expected got
-  in
-  (name, `Quick, run)
+let interpret_test {point; scalar; expected} () =
+  let got = Cstruct.to_string (Fiat_p256.dh ~scalar ~point) in
+  Alcotest.check hex __LOC__ expected got
 
 type invalid_test =
-  { name : string
-  ; public : string
+  { public : string
   ; private_ : string }
 
 let is_ok = function
@@ -66,25 +61,19 @@ let is_ok = function
   | Error _ ->
       false
 
-let interpret_invalid_test {name; public; private_} =
-  let run () =
-    let result =
-      parse_point public >>= fun _ -> parse_scalar private_ >>= fun _ -> Ok ()
-    in
-    Alcotest.check Alcotest.bool __LOC__ false (is_ok result)
+let interpret_invalid_test {public; private_} () =
+  let result =
+    parse_point public >>= fun _ -> parse_scalar private_ >>= fun _ -> Ok ()
   in
-  (name, `Quick, run)
+  Alcotest.check Alcotest.bool __LOC__ false (is_ok result)
 
 type strategy =
   | Test of test
   | Invalid_test of invalid_test
   | Skip
 
-let test_name test = Printf.sprintf "%d - %s" test.tcId test.comment
-
 let make_test test =
   let ignored_flags = ["CompressedPoint"; "UnnamedCurve"] in
-  let name = test_name test in
   match test.result with
   | _
     when has_ignored_flag test ~ignored_flags ->
@@ -95,24 +84,24 @@ let make_test test =
       (* Disable tests with invalid points - see #3 *)
       Ok Skip
   | Invalid ->
-      Ok (Invalid_test {name; public = test.public; private_ = test.private_})
+      Ok (Invalid_test {public = test.public; private_ = test.private_})
   | Acceptable ->
       Ok Skip
   | Valid ->
       parse_point test.public
       >>= fun point ->
       parse_scalar test.private_
-      >>= fun scalar ->
-      Ok (Test {name; point; scalar; expected = test.shared})
+      >>= fun scalar -> Ok (Test {point; scalar; expected = test.shared})
 
 let concat_map f l = List.map f l |> List.concat
 
 let to_tests x =
+  let name = Printf.sprintf "%d - %s" x.tcId x.comment in
   match make_test x with
   | Ok (Test t) ->
-      [interpret_test t]
+      [(name, `Quick, interpret_test t)]
   | Ok (Invalid_test t) ->
-      [interpret_invalid_test t]
+      [(name, `Quick, interpret_invalid_test t)]
   | Ok Skip ->
       []
   | Error e ->
