@@ -33,6 +33,16 @@ val to_montgomery : t -> unit
 val copy : t -> t -> unit
 (** [copy dst src] sets [dst] to [src]. *)
 
+val add : t -> t -> t -> unit
+(** [add dst a b] adds [a] and [b] and stores the result in [dst].
+    Due to how Montgomery form works, it works both in and out of the Montgomery
+    domain. *)
+
+val sub : t -> t -> t -> unit
+(** [sub dst a b] subtracts [a] and [b] and stores the result in [dst].
+    Due to how Montgomery form works, it works both in and out of the Montgomery
+    domain. *)
+
 val mul : t -> t -> t -> unit
 (** [mul dst a b] multiplies [a] and [b] (in the Montgomery domain) and stores
     the result in [dst]. *)

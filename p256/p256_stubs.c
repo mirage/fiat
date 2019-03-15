@@ -290,6 +290,20 @@ static void point_add(fe x3, fe y3, fe z3, const fe x1,
   fe_cmovznz(z3, z2nz, z1, z_out);
 }
 
+CAMLprim value fiat_p256_caml_sub(value out, value a, value b)
+{
+	CAMLparam3(out, a, b);
+	fiat_p256_sub(Caml_ba_data_val(out), Caml_ba_data_val(a), Caml_ba_data_val(b));
+	CAMLreturn(Val_unit);
+}
+
+CAMLprim value fiat_p256_caml_add(value out, value a, value b)
+{
+	CAMLparam3(out, a, b);
+	fiat_p256_add(Caml_ba_data_val(out), Caml_ba_data_val(a), Caml_ba_data_val(b));
+	CAMLreturn(Val_unit);
+}
+
 CAMLprim value fiat_p256_caml_mul(value out, value a, value b)
 {
 	CAMLparam3(out, a, b);

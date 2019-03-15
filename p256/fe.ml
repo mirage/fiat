@@ -4,6 +4,10 @@ let create () = Cstruct.to_bigarray (Cstruct.create 32)
 
 external mul : t -> t -> t -> unit = "fiat_p256_caml_mul" [@@noalloc]
 
+external sub : t -> t -> t -> unit = "fiat_p256_caml_sub" [@@noalloc]
+
+external add : t -> t -> t -> unit = "fiat_p256_caml_add" [@@noalloc]
+
 let r_squared =
   Cstruct.to_bigarray
     (Cstruct.of_hex
