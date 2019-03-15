@@ -9,20 +9,15 @@ let at_infinity () =
   let f_z = Fe.create () in
   {f_x; f_y; f_z}
 
-let fe_from_be_cstruct cs =
-  let cs_rev = Cstruct.rev cs in
-  let fe = Fe.create () in
-  Fe.from_bytes fe cs_rev; Fe.to_montgomery fe; fe
-
 let is_on_curve ~x ~y =
   let a =
-    fe_from_be_cstruct
+    Fe.from_be_cstruct
       (Hex.to_cstruct
          (`Hex
            "FFFFFFFF00000001000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFC"))
   in
   let b =
-    fe_from_be_cstruct
+    Fe.from_be_cstruct
       (Hex.to_cstruct
          (`Hex
            "5AC635D8AA3A93E7B3EBBD55769886BC651D06B0CC53B0F63BCE3C3E27D2604B"))
@@ -41,7 +36,7 @@ let is_on_curve ~x ~y =
   not (Fe.nz sum)
 
 let%expect_test "is_on_curve" =
-  let fe_from_hex hex = fe_from_be_cstruct (Hex.to_cstruct hex) in
+  let fe_from_hex hex = Fe.from_be_cstruct (Hex.to_cstruct hex) in
   let test ~x ~y =
     Printf.printf "%b" (is_on_curve ~x:(fe_from_hex x) ~y:(fe_from_hex y))
   in
@@ -67,8 +62,8 @@ let of_cstruct cs =
   | 0x00, 1 ->
       Some (at_infinity ())
   | 0x04, 65 ->
-      let f_x = fe_from_be_cstruct (Cstruct.sub cs 1 32) in
-      let f_y = fe_from_be_cstruct (Cstruct.sub cs 33 32) in
+      let f_x = Fe.from_be_cstruct (Cstruct.sub cs 1 32) in
+      let f_y = Fe.from_be_cstruct (Cstruct.sub cs 33 32) in
       if is_on_curve ~x:f_x ~y:f_y then
         let f_z = Fe.one () in
         Some {f_x; f_y; f_z}
