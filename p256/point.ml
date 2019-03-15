@@ -9,25 +9,87 @@ let at_infinity () =
   let f_z = Fe.create () in
   {f_x; f_y; f_z}
 
+let is_on_curve ~x ~y =
+  let a = Fe.from_be_cstruct (Hex.to_cstruct Parameters.a) in
+  let b = Fe.from_be_cstruct (Hex.to_cstruct Parameters.b) in
+  let x3 = Fe.create () in
+  Fe.mul x3 x x;
+  Fe.mul x3 x3 x;
+  let ax = Fe.create () in
+  Fe.mul ax a x;
+  let y2 = Fe.create () in
+  Fe.mul y2 y y;
+  let sum = Fe.create () in
+  Fe.add sum x3 ax;
+  Fe.add sum sum b;
+  Fe.sub sum sum y2;
+  not (Fe.nz sum)
+
+let%expect_test "is_on_curve" =
+  let fe_from_hex hex = Fe.from_be_cstruct (Hex.to_cstruct hex) in
+  let test ~x ~y =
+    Printf.printf "%b" (is_on_curve ~x:(fe_from_hex x) ~y:(fe_from_hex y))
+  in
+  test
+    ~x:
+      (`Hex
+        "62d5bd3372af75fe85a040715d0f502428e07046868b0bfdfa61d731afe44f26")
+    ~y:
+      (`Hex
+        "ac333a93a9e70a81cd5a95b5bf8d13990eb741c8c38872b4a07d275a014e30cf");
+  [%expect {| true |}];
+  test
+    ~x:
+      (`Hex
+        "0000000000000000000000000000000000000000000000000000000000000000")
+    ~y:
+      (`Hex
+        "0000000000000000000000000000000000000000000000000000000000000000");
+  [%expect {| false |}]
+
 let of_cstruct cs =
   match (Cstruct.get_uint8 cs 0, Cstruct.len cs) with
   | 0x00, 1 ->
       Some (at_infinity ())
   | 0x04, 65 ->
-      let f_x = Fe.create () in
-      let f_y = Fe.create () in
-      let buf_x = Cstruct.rev @@ Cstruct.sub cs 1 32 in
-      let buf_y = Cstruct.rev @@ Cstruct.sub cs 33 32 in
-      Fe.from_bytes f_x buf_x;
-      Fe.to_montgomery f_x;
-      Fe.from_bytes f_y buf_y;
-      Fe.to_montgomery f_y;
-      let f_z = Fe.one () in
-      Some {f_x; f_y; f_z}
+      let f_x = Fe.from_be_cstruct (Cstruct.sub cs 1 32) in
+      let f_y = Fe.from_be_cstruct (Cstruct.sub cs 33 32) in
+      if is_on_curve ~x:f_x ~y:f_y then
+        let f_z = Fe.one () in
+        Some {f_x; f_y; f_z}
+      else None
   | _ ->
       None
 
 let of_hex h = of_cstruct (Hex.to_cstruct h)
+
+let%expect_test "of_hex" =
+  let test hex =
+    let ok =
+      match of_hex hex with
+      | Some _ ->
+          true
+      | None ->
+          false
+    in
+    Printf.printf "%b" ok
+  in
+  test (`Hex "00");
+  [%expect {| true |}];
+  test (`Hex "0001");
+  [%expect {| false |}];
+  test
+    (`Hex
+      "0400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000");
+  [%expect {| false |}];
+  test
+    (`Hex
+      "0462d5bd3372af75fe85a040715d0f502428e07046868b0bfdfa61d731afe44f26ac333a93a9e70a81cd5a95b5bf8d13990eb741c8c38872b4a07d275a014e30cf");
+  [%expect {| true |}];
+  test (`Hex "0400");
+  [%expect {| false |}];
+  test (`Hex "ff");
+  [%expect {| false |}]
 
 let of_hex_exn h =
   match of_hex h with

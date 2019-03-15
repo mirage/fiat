@@ -79,9 +79,8 @@ let make_test test =
     when has_ignored_flag test ~ignored_flags ->
       Ok Skip
   | _
-    when test.comment = "point is not on curve"
-         || List.mem test.tcId [92; 93; 94] ->
-      (* Disable tests with invalid points - see #3 *)
+    when test.tcId = 92 ->
+      (* Disable test with point at infinity - see #3 *)
       Ok Skip
   | Invalid ->
       Ok (Invalid_test {public = test.public; private_ = test.private_})

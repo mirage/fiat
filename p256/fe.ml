@@ -4,6 +4,10 @@ let create () = Cstruct.to_bigarray (Cstruct.create 32)
 
 external mul : t -> t -> t -> unit = "fiat_p256_caml_mul" [@@noalloc]
 
+external sub : t -> t -> t -> unit = "fiat_p256_caml_sub" [@@noalloc]
+
+external add : t -> t -> t -> unit = "fiat_p256_caml_add" [@@noalloc]
+
 let r_squared =
   Cstruct.to_bigarray
     (Cstruct.of_hex
@@ -47,3 +51,8 @@ external to_bytes_buf :
 let to_bytes cs fe = to_bytes_buf (checked_buffer cs) fe
 
 external inv : t -> t -> unit = "fiat_p256_caml_inv" [@@noalloc]
+
+let from_be_cstruct cs =
+  let cs_rev = Cstruct.rev cs in
+  let fe = create () in
+  from_bytes fe cs_rev; to_montgomery fe; fe

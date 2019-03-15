@@ -26,12 +26,18 @@ val from_montgomery : t -> unit
 (** Translate a field element out of the Montgomery domain.
     That is to say, it divides by [R] in place. *)
 
-val to_montgomery : t -> unit
-(** Convert a field element into the Montgomery domain.
-    That is to say, it multiplies by [R] in place. *)
-
 val copy : t -> t -> unit
 (** [copy dst src] sets [dst] to [src]. *)
+
+val add : t -> t -> t -> unit
+(** [add dst a b] adds [a] and [b] and stores the result in [dst].
+    Due to how Montgomery form works, it works both in and out of the Montgomery
+    domain. *)
+
+val sub : t -> t -> t -> unit
+(** [sub dst a b] subtracts [a] and [b] and stores the result in [dst].
+    Due to how Montgomery form works, it works both in and out of the Montgomery
+    domain. *)
 
 val mul : t -> t -> t -> unit
 (** [mul dst a b] multiplies [a] and [b] (in the Montgomery domain) and stores
@@ -47,3 +53,6 @@ val sqr : t -> t -> unit
 val inv : t -> t -> unit
 (** [inv dst src] computes the modular inverse of [src] and stores the result in
     [dst]. *)
+
+val from_be_cstruct : Cstruct.t -> t
+(** Converts from a big-endian cstruct to Montgomery form. *)
