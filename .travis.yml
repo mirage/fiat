@@ -9,7 +9,6 @@ env:
     - PACKAGE=fiat_p256
     - DISTRO=alpine-3.7
   matrix:
-    - OCAML_VERSION=4.04
     - OCAML_VERSION=4.05
     - OCAML_VERSION=4.06
     - OCAML_VERSION=4.07
