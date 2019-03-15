@@ -18,7 +18,7 @@ depends: [
   "alcotest" {with-test}
   "asn1-combinators" {with-test}
   "cstruct" {>= "3.5.0"}
-  "dune" {build & >= "1.6.0"}
+  "dune" {build & >= "1.7.0"}
   "hex"
   "hex" {with-test}
   "ocamlformat" {with-test & = "0.8"}
