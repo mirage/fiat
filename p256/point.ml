@@ -10,18 +10,8 @@ let at_infinity () =
   {f_x; f_y; f_z}
 
 let is_on_curve ~x ~y =
-  let a =
-    Fe.from_be_cstruct
-      (Hex.to_cstruct
-         (`Hex
-           "FFFFFFFF00000001000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFC"))
-  in
-  let b =
-    Fe.from_be_cstruct
-      (Hex.to_cstruct
-         (`Hex
-           "5AC635D8AA3A93E7B3EBBD55769886BC651D06B0CC53B0F63BCE3C3E27D2604B"))
-  in
+  let a = Fe.from_be_cstruct (Hex.to_cstruct Parameters.a) in
+  let b = Fe.from_be_cstruct (Hex.to_cstruct Parameters.b) in
   let x3 = Fe.create () in
   Fe.mul x3 x x;
   Fe.mul x3 x3 x;

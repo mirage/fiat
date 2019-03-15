@@ -1,9 +1,6 @@
 let dh ~scalar ~point = Point.x (Montgomery_ladder.scalar_mult scalar point)
 
-let base_point =
-  Point.of_hex_exn
-    (`Hex
-      "046B17D1F2E12C4247F8BCE6E563A440F277037D812DEB33A0F4A13945D898C2964FE342E2FE1A7F9B8EE7EB4A7C0F9E162BCE33576B315ECECBB6406837BF51F5")
+let base_point = Point.of_hex_exn Parameters.g
 
 let public scalar = Montgomery_ladder.scalar_mult scalar base_point
 
