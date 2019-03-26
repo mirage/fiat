@@ -47,11 +47,14 @@ let%expect_test "is_on_curve" =
         "0000000000000000000000000000000000000000000000000000000000000000");
   [%expect {| false |}]
 
+let first_byte cs =
+  if Cstruct.len cs = 0 then None else Some (Cstruct.get_uint8 cs 0)
+
 let of_cstruct cs =
-  match (Cstruct.get_uint8 cs 0, Cstruct.len cs) with
-  | 0x00, 1 ->
+  match (first_byte cs, Cstruct.len cs) with
+  | Some 0x00, 1 ->
       Some (at_infinity ())
-  | 0x04, 65 ->
+  | Some 0x04, 65 ->
       let f_x = Fe.from_be_cstruct (Cstruct.sub cs 1 32) in
       let f_y = Fe.from_be_cstruct (Cstruct.sub cs 33 32) in
       if is_on_curve ~x:f_x ~y:f_y then
