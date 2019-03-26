@@ -25,20 +25,24 @@ let is_solution_to_curve_equation ~x ~y =
   Fe.sub sum sum y2;
   not (Fe.nz sum)
 
+let check_coordinate cs =
+  let p = Hex.to_cstruct Parameters.p in
+  if Cstruct_util.compare_be cs p >= 0 then None
+  else Some (Fe.from_be_cstruct cs)
+
 (** Convert cstruct coordinates to a finite point ensuring:
     - x < p
+    - y < p
     - y^2 = ax^3 + ax + b
 *)
 let validate_finite_point ~x ~y =
-  let p = Hex.to_cstruct Parameters.p in
-  if Cstruct_util.compare_be x p >= 0 then None
-  else
-    let x = Fe.from_be_cstruct x in
-    let y = Fe.from_be_cstruct y in
-    if is_solution_to_curve_equation ~x ~y then
+  match (check_coordinate x, check_coordinate y) with
+  | Some f_x, Some f_y
+    when is_solution_to_curve_equation ~x:f_x ~y:f_y ->
       let f_z = Fe.one () in
-      Some {f_x = x; f_y = y; f_z}
-    else None
+      Some {f_x; f_y; f_z}
+  | _ ->
+      None
 
 let%expect_test "validate_finite_point" =
   let is_some = function
