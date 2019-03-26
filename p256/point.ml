@@ -45,7 +45,15 @@ let%expect_test "is_on_curve" =
     ~y:
       (`Hex
         "0000000000000000000000000000000000000000000000000000000000000000");
-  [%expect {| false |}]
+  [%expect {| false |}];
+  let zero = `Hex (String.make 64 '0') in
+  let sb =
+    `Hex "66485c780e2f83d72433bd5d84a06bb6541c2af31dae871728bf856a174f93f4"
+  in
+  test ~x:zero ~y:sb;
+  [%expect {| true |}];
+  test ~x:Parameters.p ~y:sb;
+  [%expect {| true |}]
 
 let first_byte cs =
   if Cstruct.len cs = 0 then None else Some (Cstruct.get_uint8 cs 0)

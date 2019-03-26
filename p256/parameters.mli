@@ -8,3 +8,6 @@ val b : Hex.t
 
 val g : Hex.t
 (** The base point, in uncompressed form. *)
+
+val p : Hex.t
+(** The prime number corresponding to [Fe]. *)
