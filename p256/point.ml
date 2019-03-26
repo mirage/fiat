@@ -25,14 +25,20 @@ let is_solution_to_curve_equation ~x ~y =
   Fe.sub sum sum y2;
   not (Fe.nz sum)
 
-(** Make sure that a point (not at infinity) satisfies the curve equation. *)
+(** Convert cstruct coordinates to a finite point ensuring:
+    - x < p
+    - y^2 = ax^3 + ax + b
+*)
 let validate_finite_point ~x ~y =
-  let x = Fe.from_be_cstruct x in
-  let y = Fe.from_be_cstruct y in
-  if is_solution_to_curve_equation ~x ~y then
-    let f_z = Fe.one () in
-    Some {f_x = x; f_y = y; f_z}
-  else None
+  let p = Hex.to_cstruct Parameters.p in
+  if Cstruct_util.compare_be x p >= 0 then None
+  else
+    let x = Fe.from_be_cstruct x in
+    let y = Fe.from_be_cstruct y in
+    if is_solution_to_curve_equation ~x ~y then
+      let f_z = Fe.one () in
+      Some {f_x = x; f_y = y; f_z}
+    else None
 
 let%expect_test "validate_finite_point" =
   let is_some = function
@@ -69,7 +75,7 @@ let%expect_test "validate_finite_point" =
   test ~x:zero ~y:sb;
   [%expect {| true |}];
   test ~x:Parameters.p ~y:sb;
-  [%expect {| true |}]
+  [%expect {| false |}]
 
 let first_byte cs =
   if Cstruct.len cs = 0 then None else Some (Cstruct.get_uint8 cs 0)
