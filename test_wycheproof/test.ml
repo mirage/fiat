@@ -78,10 +78,6 @@ let make_test test =
   | _
     when has_ignored_flag test ~ignored_flags ->
       Ok Skip
-  | _
-    when test.tcId = 92 ->
-      (* Disable test with point at infinity - see #3 *)
-      Ok Skip
   | Invalid ->
       Ok (Invalid_test {public = test.public; private_ = test.private_})
   | Acceptable ->

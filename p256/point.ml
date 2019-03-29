@@ -9,7 +9,7 @@ let at_infinity () =
   let f_z = Fe.create () in
   {f_x; f_y; f_z}
 
-let is_on_curve ~x ~y =
+let is_solution_to_curve_equation ~x ~y =
   let a = Fe.from_be_cstruct (Hex.to_cstruct Parameters.a) in
   let b = Fe.from_be_cstruct (Hex.to_cstruct Parameters.b) in
   let x3 = Fe.create () in
@@ -25,10 +25,36 @@ let is_on_curve ~x ~y =
   Fe.sub sum sum y2;
   not (Fe.nz sum)
 
-let%expect_test "is_on_curve" =
-  let fe_from_hex hex = Fe.from_be_cstruct (Hex.to_cstruct hex) in
+let check_coordinate cs =
+  let p = Hex.to_cstruct Parameters.p in
+  if Cstruct_util.compare_be cs p >= 0 then None
+  else Some (Fe.from_be_cstruct cs)
+
+(** Convert cstruct coordinates to a finite point ensuring:
+    - x < p
+    - y < p
+    - y^2 = ax^3 + ax + b
+*)
+let validate_finite_point ~x ~y =
+  match (check_coordinate x, check_coordinate y) with
+  | Some f_x, Some f_y
+    when is_solution_to_curve_equation ~x:f_x ~y:f_y ->
+      let f_z = Fe.one () in
+      Some {f_x; f_y; f_z}
+  | _ ->
+      None
+
+let%expect_test "validate_finite_point" =
+  let is_some = function
+    | Some _ ->
+        true
+    | None ->
+        false
+  in
   let test ~x ~y =
-    Printf.printf "%b" (is_on_curve ~x:(fe_from_hex x) ~y:(fe_from_hex y))
+    Printf.printf "%b"
+      (is_some
+         (validate_finite_point ~x:(Hex.to_cstruct x) ~y:(Hex.to_cstruct y)))
   in
   test
     ~x:
@@ -45,19 +71,27 @@ let%expect_test "is_on_curve" =
     ~y:
       (`Hex
         "0000000000000000000000000000000000000000000000000000000000000000");
+  [%expect {| false |}];
+  let zero = `Hex (String.make 64 '0') in
+  let sb =
+    `Hex "66485c780e2f83d72433bd5d84a06bb6541c2af31dae871728bf856a174f93f4"
+  in
+  test ~x:zero ~y:sb;
+  [%expect {| true |}];
+  test ~x:Parameters.p ~y:sb;
   [%expect {| false |}]
 
+let first_byte cs =
+  if Cstruct.len cs = 0 then None else Some (Cstruct.get_uint8 cs 0)
+
 let of_cstruct cs =
-  match (Cstruct.get_uint8 cs 0, Cstruct.len cs) with
-  | 0x00, 1 ->
+  match (first_byte cs, Cstruct.len cs) with
+  | Some 0x00, 1 ->
       Some (at_infinity ())
-  | 0x04, 65 ->
-      let f_x = Fe.from_be_cstruct (Cstruct.sub cs 1 32) in
-      let f_y = Fe.from_be_cstruct (Cstruct.sub cs 33 32) in
-      if is_on_curve ~x:f_x ~y:f_y then
-        let f_z = Fe.one () in
-        Some {f_x; f_y; f_z}
-      else None
+  | Some 0x04, 65 ->
+      let x = Cstruct.sub cs 1 32 in
+      let y = Cstruct.sub cs 33 32 in
+      validate_finite_point ~x ~y
   | _ ->
       None
 
