@@ -38,9 +38,7 @@ let parse_point s =
   result_of_option ~msg:"cannot parse point"
     (Fiat_p256.point_of_hex (Hex.of_string payload))
 
-let parse_scalar s =
-  result_of_option ~msg:"cannot parse scalar"
-    (Fiat_p256.scalar_of_hex (Hex.of_string s))
+let parse_scalar s = Fiat_p256.scalar_of_hex (Hex.of_string s)
 
 type test =
   { point : Fiat_p256.point

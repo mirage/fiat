@@ -19,12 +19,12 @@ let strip_leading_zeroes cs =
 let pad ~total_len cs =
   match total_len - Cstruct.len cs with
   | 0 ->
-      Some cs
+      Ok cs
   | n
     when n < 0 ->
-      None
+      Error "input is too long"
   | pad_len ->
-      Some (Cstruct.append cs (Cstruct.create pad_len))
+      Ok (Cstruct.append cs (Cstruct.create pad_len))
 
 let is_in_range cs_le =
   let zero = Cstruct.create 32 in
@@ -35,26 +35,26 @@ let is_in_range cs_le =
 let of_cstruct cs =
   let stripped = strip_leading_zeroes cs in
   match pad ~total_len:32 (Cstruct.rev stripped) with
-  | Some padded
-    when is_in_range padded ->
-      Some (Scalar padded)
-  | _ ->
-      None
+  | Ok padded ->
+      if is_in_range padded then Ok (Scalar padded)
+      else Error "input is not in [1; n-1]"
+  | Error _ as e ->
+      e
 
 let of_hex h =
   let cs = Hex.to_cstruct h in
   of_cstruct cs
 
-let pp_opt pp fmt = function
-  | None ->
-      Format.fprintf fmt "None"
-  | Some x ->
+let pp_err pp fmt = function
+  | Error e ->
+      Format.fprintf fmt "Error: %s" e
+  | Ok x ->
       pp fmt x
 
 let%expect_test "of_hex" =
   let test h =
     let s = of_hex h in
-    Format.printf "%a\n" (pp_opt pp) s
+    Format.printf "%a\n" (pp_err pp) s
   in
   test
     (`Hex "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f");
@@ -70,14 +70,14 @@ let%expect_test "of_hex" =
   [%expect
     {| 000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f |}];
   test (`Hex "");
-  [%expect {| None |}];
+  [%expect {| Error: input is not in [1; n-1] |}];
   test
     (`Hex
       "2000000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f");
-  [%expect {| None |}];
+  [%expect {| Error: input is too long |}];
   test
     (`Hex "0000000000000000000000000000000000000000000000000000000000000000");
-  [%expect {| None |}];
+  [%expect {| Error: input is not in [1; n-1] |}];
   test
     (`Hex
       (* n-1 *)
@@ -85,19 +85,19 @@ let%expect_test "of_hex" =
   [%expect
     {| ffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632550 |}];
   test Parameters.n;
-  [%expect {| None |}];
+  [%expect {| Error: input is not in [1; n-1] |}];
   test
     (`Hex
       (* n+1 *)
       "FFFFFFFF00000000FFFFFFFFFFFFFFFFBCE6FAADA7179E84F3B9CAC2FC632552");
-  [%expect {| None |}]
+  [%expect {| Error: input is not in [1; n-1] |}]
 
 let of_hex_exn h =
   match of_hex h with
-  | Some p ->
+  | Ok p ->
       p
-  | None ->
-      failwith "of_hex_exn"
+  | Error e ->
+      Printf.ksprintf failwith "of_hex_exn: %s" e
 
 let bit_at (Scalar s) i =
   let byte_num = i / 8 in
