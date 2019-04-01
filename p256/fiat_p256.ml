@@ -1,4 +1,5 @@
-let dh ~scalar ~point = Point.x (Montgomery_ladder.scalar_mult scalar point)
+let dh ~scalar ~point =
+  Point.x_of_finite_point (Montgomery_ladder.scalar_mult scalar point)
 
 let base_point = Point.of_hex_exn Parameters.g
 

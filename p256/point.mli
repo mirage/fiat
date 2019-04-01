@@ -38,5 +38,5 @@ val to_cstruct : t -> Cstruct.t
 val pp : Format.formatter -> t -> unit
 (** Display a point in the format documented in [of_cstruct]. *)
 
-val x : t -> Cstruct.t
+val x_of_finite_point : t -> Cstruct.t
 (** Return only the X coordinate of a point that is not at infinity. *)
