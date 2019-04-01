@@ -26,15 +26,20 @@ let pad ~total_len cs =
   | pad_len ->
       Some (Cstruct.append cs (Cstruct.create pad_len))
 
+let is_in_range cs_le =
+  let zero = Cstruct.create 32 in
+  let n = Hex.to_cstruct Parameters.n in
+  let cs = Cstruct.rev cs_le in
+  Cstruct_util.compare_be cs zero > 0 && Cstruct_util.compare_be n cs > 0
+
 let of_cstruct cs =
-  if Cstruct.len cs = 0 then None
-  else
-    let stripped = strip_leading_zeroes cs in
-    match pad ~total_len:32 (Cstruct.rev stripped) with
-    | Some padded ->
-        Some (Scalar padded)
-    | None ->
-        None
+  let stripped = strip_leading_zeroes cs in
+  match pad ~total_len:32 (Cstruct.rev stripped) with
+  | Some padded
+    when is_in_range padded ->
+      Some (Scalar padded)
+  | _ ->
+      None
 
 let of_hex h =
   let cs = Hex.to_cstruct h in
@@ -66,12 +71,25 @@ let%expect_test "of_hex" =
     {| 000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f |}];
   test (`Hex "");
   [%expect {| None |}];
-  test (`Hex "00");
-  [%expect
-    {| 0000000000000000000000000000000000000000000000000000000000000000 |}];
   test
     (`Hex
       "2000000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f");
+  [%expect {| None |}];
+  test
+    (`Hex "0000000000000000000000000000000000000000000000000000000000000000");
+  [%expect {| None |}];
+  test
+    (`Hex
+      (* n-1 *)
+      "FFFFFFFF00000000FFFFFFFFFFFFFFFFBCE6FAADA7179E84F3B9CAC2FC632550");
+  [%expect
+    {| ffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632550 |}];
+  test Parameters.n;
+  [%expect {| None |}];
+  test
+    (`Hex
+      (* n+1 *)
+      "FFFFFFFF00000000FFFFFFFFFFFFFFFFBCE6FAADA7179E84F3B9CAC2FC632552");
   [%expect {| None |}]
 
 let of_hex_exn h =

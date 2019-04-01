@@ -1,9 +1,10 @@
-(** A scalar value. *)
+(** A scalar value strictly between 1 and n-1 where n is the group order. *)
 type t
 
 val of_cstruct : Cstruct.t -> t option
 (** Read data from a cstruct.
-    It should be 32 bytes long, in big endian format. *)
+    It should be 32 bytes long, in big endian format. Returns [None] when the
+    number is zero, or if it is larger than or equal to the group order. *)
 
 val of_hex : Hex.t -> t option
 (** Like [of_cstruct] but read from hex data. *)
