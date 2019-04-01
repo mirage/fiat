@@ -2,44 +2,15 @@ type t = Scalar of Cstruct.t
 
 let pp fmt (Scalar s) = Cstruct_util.pp_hex_le fmt s
 
-let strip_leading_zeroes cs =
-  let first_nonzero_index = ref None in
-  let cs_len = Cstruct.len cs in
-  for i = cs_len - 1 downto 0 do
-    if Cstruct.get_uint8 cs i <> 0 then first_nonzero_index := Some i
-  done;
-  match !first_nonzero_index with
-  | None ->
-      Cstruct.empty
-  | Some i ->
-      let off = i in
-      let len = cs_len - i in
-      Cstruct.sub cs off len
-
-let pad ~total_len cs =
-  match total_len - Cstruct.len cs with
-  | 0 ->
-      Ok cs
-  | n
-    when n < 0 ->
-      Error "input is too long"
-  | pad_len ->
-      Ok (Cstruct.append cs (Cstruct.create pad_len))
-
-let is_in_range cs_le =
+let is_in_range cs =
   let zero = Cstruct.create 32 in
   let n = Hex.to_cstruct Parameters.n in
-  let cs = Cstruct.rev cs_le in
   Cstruct_util.compare_be cs zero > 0 && Cstruct_util.compare_be n cs > 0
 
 let of_cstruct cs =
-  let stripped = strip_leading_zeroes cs in
-  match pad ~total_len:32 (Cstruct.rev stripped) with
-  | Ok padded ->
-      if is_in_range padded then Ok (Scalar padded)
-      else Error "input is not in [1; n-1]"
-  | Error _ as e ->
-      e
+  if Cstruct.len cs <> 32 then Error "input has incorrect length"
+  else if is_in_range cs then Ok (Scalar (Cstruct.rev cs))
+  else Error "input is not in [1; n-1]"
 
 let of_hex h =
   let cs = Hex.to_cstruct h in
@@ -59,22 +30,15 @@ let%expect_test "of_hex" =
   test
     (`Hex "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f");
   [%expect
-    {| 000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f
-|}];
-  test (`Hex "03");
+    {| 000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f |}];
+  test
+    (`Hex "0000000000000000000000000000000000000000000000000000000000000003");
   [%expect
     {| 0000000000000000000000000000000000000000000000000000000000000003 |}];
   test
     (`Hex
-      "00000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f");
-  [%expect
-    {| 000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f |}];
-  test (`Hex "");
-  [%expect {| Error: input is not in [1; n-1] |}];
-  test
-    (`Hex
       "2000000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f");
-  [%expect {| Error: input is too long |}];
+  [%expect {| Error: input has incorrect length |}];
   test
     (`Hex "0000000000000000000000000000000000000000000000000000000000000000");
   [%expect {| Error: input is not in [1; n-1] |}];

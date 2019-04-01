@@ -38,7 +38,34 @@ let parse_point s =
   result_of_option ~msg:"cannot parse point"
     (Fiat_p256.point_of_hex (Hex.of_string payload))
 
-let parse_scalar s = Fiat_p256.scalar_of_hex (Hex.of_string s)
+let strip_leading_zeroes cs =
+  let first_nonzero_index = ref None in
+  let cs_len = Cstruct.len cs in
+  for i = cs_len - 1 downto 0 do
+    if Cstruct.get_uint8 cs i <> 0 then first_nonzero_index := Some i
+  done;
+  match !first_nonzero_index with
+  | None ->
+      Cstruct.empty
+  | Some i ->
+      let off = i in
+      let len = cs_len - i in
+      Cstruct.sub cs off len
+
+let pad ~total_len cs =
+  match total_len - Cstruct.len cs with
+  | 0 ->
+      Ok cs
+  | n
+    when n < 0 ->
+      Error "input is too long"
+  | pad_len ->
+      Ok (Cstruct.append cs (Cstruct.create pad_len))
+
+let parse_scalar s =
+  let stripped = strip_leading_zeroes (Cstruct.of_string s) in
+  pad ~total_len:32 (Cstruct.rev stripped)
+  >>= fun cs -> Fiat_p256.scalar_of_cs (Cstruct.rev cs)
 
 type test =
   { point : Fiat_p256.point

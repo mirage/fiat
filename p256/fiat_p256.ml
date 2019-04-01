@@ -17,7 +17,7 @@ let%expect_test "dh" =
   let d_b =
     Scalar.of_hex_exn
       (`Hex
-        "00000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f")
+        "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f")
   in
   let p_a = public d_a in
   let p_b = public d_b in
