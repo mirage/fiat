@@ -150,10 +150,12 @@ let verify_steps ~r ~s ~h ~pub_key =
     let gu = Montgomery_ladder.scalar_mult (scalar_of_z u) base_point in
     let gwv = Montgomery_ladder.scalar_mult (scalar_of_z v) pub_key in
     let sum = Point.add gu gwv in
-    let x = Point.x_of_finite_point sum in
-    let x_z = Z.of_bits (Cstruct.to_string (Cstruct.rev x)) in
-    let ok = equal_mod x_z r in
-    Some {w; u; v; gu; gwv; sum; x_z; ok}
+    if Point.is_at_infinity sum then None
+    else
+      let x = Point.x_of_finite_point sum in
+      let x_z = Z.of_bits (Cstruct.to_string (Cstruct.rev x)) in
+      let ok = equal_mod x_z r in
+      Some {w; u; v; gu; gwv; sum; x_z; ok}
   else None
 
 let verify msg pub_key ~r ~s =

@@ -40,3 +40,5 @@ val pp : Format.formatter -> t -> unit
 
 val x_of_finite_point : t -> Cstruct.t
 (** Return only the X coordinate of a point that is not at infinity. *)
+
+val is_at_infinity : t -> bool

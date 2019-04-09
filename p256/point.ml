@@ -272,3 +272,5 @@ let x_of_finite_point p =
       assert false
   | Some (x, _) ->
       Cstruct.rev x
+
+let is_at_infinity p = not (Fe.nz p.f_z)
