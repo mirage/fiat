@@ -11,3 +11,6 @@ val g : Hex.t
 
 val p : Hex.t
 (** The prime number corresponding to [Fe]. *)
+
+val n : Hex.t
+(** The group order. *)

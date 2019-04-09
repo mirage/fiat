@@ -266,9 +266,9 @@ let%expect_test "double vs add" =
   [%expect
     {| 04e2534a3532d08fbba02dde659ee62bd0031fe2db785596ef509302446b030852e0f1575a4c633cc719dfee5fda862d764efc96c3f30ee0055c42c23f184ed8c6 |}]
 
-let x p =
+let x_of_finite_point p =
   match to_affine p with
   | None ->
-      Cstruct.create 1
+      assert false
   | Some (x, _) ->
       Cstruct.rev x
