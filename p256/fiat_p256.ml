@@ -99,8 +99,10 @@ let z_of_hex (`Hex s) =
 
 let%expect_test "z_of_hex" =
   let test h = Z.print (z_of_hex h) in
-  test (`Hex "f000000000000000000000000000000000000000000000000000000000000000");
-  [%expect{| 108555083659983933209597798445644913612440610624038028786991485007418559037440 |}]
+  test
+    (`Hex "f000000000000000000000000000000000000000000000000000000000000000");
+  [%expect
+    {| 108555083659983933209597798445644913612440610624038028786991485007418559037440 |}]
 
 let pp_z_hex fmt z =
   let bits = Z.to_bits z in
@@ -110,7 +112,9 @@ let pp_z_hex fmt z =
 
 let scalar_of_z z =
   let s = Format.asprintf "%a" pp_z_hex z in
-  Scalar.of_hex_exn (`Hex s)
+  let s_len = String.length s in
+  let padded = String.make (64 - s_len) '0' ^ s in
+  Scalar.of_hex_exn (`Hex padded)
 
 type verify_steps =
   { w : Z.t
@@ -129,10 +133,7 @@ let pp_steps fmt {w; u; v; gu; gwv; sum; x_z; ok} =
     pp_z_hex x_z ok
 
 let verify_steps ~r ~s ~h ~pub_key =
-  let n_hex =
-    `Hex "FFFFFFFF00000000FFFFFFFFFFFFFFFFBCE6FAADA7179E84F3B9CAC2FC632551"
-  in
-  let n = z_of_hex n_hex in
+  let n = z_of_hex Parameters.n in
   let in_range x = Z.compare x Z.one >= 0 && Z.compare n x > 0 in
   let mul_mod a b =
     let open Z in
