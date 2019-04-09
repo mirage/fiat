@@ -1,5 +1,4 @@
 (test
  (name test)
- (deps ecdh_secp256r1_test.json)
- (libraries alcotest fiat_p256 wycheproof str asn1-combinators)
-)
+ (deps (glob_files *.json))
+ (libraries alcotest fiat_p256 wycheproof digestif.ocaml str asn1-combinators))

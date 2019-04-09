@@ -38,11 +38,13 @@ type test =
   { tcId : int
   ; comment : string
   ; curve : json option [@yojson.default None]
-  ; public : hex
-  ; private_ : hex [@yojson.key "private"]
-  ; shared : hex
+  ; public : hex option [@yojson.default None]
+  ; private_ : hex option [@yojson.default None] [@yojson.key "private"]
+  ; shared : hex option [@yojson.default None]
   ; result : test_result
-  ; flags : string list }
+  ; flags : string list
+  ; msg : hex option [@yojson.default None]
+  ; sig_ : hex option [@yojson.default None] [@yojson.key "sig"] }
 [@@deriving of_yojson, show]
 
 let has_ignored_flag test ~ignored_flags =
@@ -51,10 +53,14 @@ let has_ignored_flag test ~ignored_flags =
     ignored_flags
 
 type test_group =
-  { curve : json
+  { curve : json option [@yojson.default None]
   ; tests : test list
   ; encoding : json option [@yojson.default None]
-  ; type_ : json option [@yojson.default None] [@yojson.key "type"] }
+  ; type_ : json option [@yojson.default None] [@yojson.key "type"]
+  ; key : json option [@yojson.default None]
+  ; keyDer : hex option [@yojson.default None]
+  ; keyPem : json option [@yojson.default None]
+  ; sha : json option [@yojson.default None] }
 [@@deriving of_yojson, show]
 
 type test_file =

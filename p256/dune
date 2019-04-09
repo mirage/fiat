@@ -1,6 +1,6 @@
 (library
  (public_name fiat_p256)
- (libraries cstruct hex)
+ (libraries cstruct hex zarith)
  (c_names p256_stubs)
  (c_flags (:include discover/cflags.sexp))
  (preprocess (pps ppx_expect))
