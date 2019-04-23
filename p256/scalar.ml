@@ -1,18 +1,5 @@
 type t = Scalar of Cstruct.t
 
-type error =
-  [ `InvalidLength
-  | `InvalidRange ]
-
-let error_to_string = function
-  | `InvalidLength ->
-      "input has incorrect length"
-  | `InvalidRange ->
-      "input is not in [1; n-1]"
-
-let pp_error fmt e =
-  Format.fprintf fmt "Cannot parse scalar: %s" (error_to_string e)
-
 let pp fmt (Scalar s) = Cstruct_util.pp_hex_le fmt s
 
 let is_in_range cs =
@@ -31,7 +18,7 @@ let of_hex h =
 
 let pp_err pp fmt = function
   | Error e ->
-      pp_error fmt e
+      Error.pp_scalar_error fmt e
   | Ok x ->
       pp fmt x
 
@@ -51,10 +38,10 @@ let%expect_test "of_hex" =
   test
     (`Hex
       "2000000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f");
-  [%expect {| Cannot parse scalar: input has incorrect length |}];
+  [%expect {| Cannot parse scalar: invalid length |}];
   test
     (`Hex "0000000000000000000000000000000000000000000000000000000000000000");
-  [%expect {| Cannot parse scalar: input is not in [1; n-1] |}];
+  [%expect {| Cannot parse scalar: invalid range |}];
   test
     (`Hex
       (* n-1 *)
@@ -62,19 +49,19 @@ let%expect_test "of_hex" =
   [%expect
     {| ffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632550 |}];
   test Parameters.n;
-  [%expect {| Cannot parse scalar: input is not in [1; n-1] |}];
+  [%expect {| Cannot parse scalar: invalid range |}];
   test
     (`Hex
       (* n+1 *)
       "FFFFFFFF00000000FFFFFFFFFFFFFFFFBCE6FAADA7179E84F3B9CAC2FC632552");
-  [%expect {| Cannot parse scalar: input is not in [1; n-1] |}]
+  [%expect {| Cannot parse scalar: invalid range |}]
 
 let of_hex_exn h =
   match of_hex h with
   | Ok p ->
       p
   | Error e ->
-      Printf.ksprintf failwith "of_hex_exn: %s" (error_to_string e)
+      failwith (Format.asprintf "of_hex_exn: %a" Error.pp_scalar_error e)
 
 let bit_at (Scalar s) i =
   let byte_num = i / 8 in

@@ -36,21 +36,31 @@ let%expect_test "dh" =
 
 type point = Point.t
 
-type point_error = Point.error
+type point_error = Error.point_error
 
-let pp_point_error = Point.pp_error
+let pp_point_error = Error.pp_point_error
 
-let point_of_hex = Point.of_hex
+let check_point = function
+  | Ok p
+    when not (Point.is_infinity p) ->
+      Ok p
+  | Ok _ ->
+      Error `AtInfinity
+  | Error _ as e ->
+      e
 
-let point_of_cs = Point.of_cstruct
+let point_of_hex h =
+  check_point (Point.of_hex h)
+
+let point_of_cs c = check_point (Point.of_cstruct c)
 
 let point_to_cs = Point.to_cstruct
 
 type scalar = Scalar.t
 
-type scalar_error = Scalar.error
+type scalar_error = Error.scalar_error
 
-let pp_scalar_error = Scalar.pp_error
+let pp_scalar_error = Error.pp_scalar_error
 
 let scalar_of_hex = Scalar.of_hex
 

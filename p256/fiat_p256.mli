@@ -1,18 +1,20 @@
-(** A point on the P-256 curve (public key). *)
+(** A point on the P-256 curve (public key), that is not the point at infinity. *)
 type point
 
 (** The type for point parsing errors. *)
 type point_error =
-  [ `CoordinateTooLarge
+  [ `InvalidRange
   | `InvalidFormat
   | `InvalidLength
-  | `NotOnCurve ]
+  | `NotOnCurve
+  | `AtInfinity ]
 
 val pp_point_error : Format.formatter -> point_error -> unit
 (** Pretty printer for point parsing errors *)
 
 val point_of_cs : Cstruct.t -> (point, point_error) result
-(** Convert from cstruct. The format is the uncompressed format described in
+(** Convert from cstruct. Refuses the point at infinity.
+    The format is the uncompressed format described in
     SEC1, section 2.3.4, that is to say:
 
     - the point at infinity is the single byte "00".
@@ -43,7 +45,8 @@ val pp_scalar_error : Format.formatter -> scalar_error -> unit
 
 val scalar_of_cs : Cstruct.t -> (scalar, scalar_error) result
 (** Read data from a cstruct.
-    It should be 32 bytes long, in big endian format. *)
+    It should be 32 bytes long, in big endian format. Returns an error when the
+    number is zero, or if it is larger than or equal to the group order. *)
 
 val scalar_of_hex : Hex.t -> (scalar, scalar_error) result
 (** Like [scalar_of_cs] but read from hex data. *)
@@ -54,4 +57,5 @@ val dh : scalar:scalar -> point:point -> Cstruct.t
 
 val public : scalar -> point
 (** Compute the public key corresponding to a given private key. Internally,
-    this multiplies the generator by the scalar. *)
+    this multiplies the generator by the scalar.
+    Given the invariant on [scalar], the result can't be the point at infinity. *)
