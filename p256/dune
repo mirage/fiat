@@ -10,6 +10,7 @@
 (rule
   (targets upstream_p256_32.h)
   (action (bash "wget https://raw.githubusercontent.com/mit-plv/fiat-crypto/ecdfd03c636ab63e167fbe4fc4d7ab0ed5d9db74/p256_32.c -O %{targets}")))
+
 (rule
   (targets upstream_p256_64.h)
   (action (bash "wget https://raw.githubusercontent.com/mit-plv/fiat-crypto/ecdfd03c636ab63e167fbe4fc4d7ab0ed5d9db74/p256_64.c -O %{targets}")))
