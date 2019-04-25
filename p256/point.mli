@@ -5,7 +5,7 @@ val at_infinity : unit -> t
 (** The point at infinity *)
 
 val add : t -> t -> t
-(** Point addition. [add p q] returns the result of the addition [p] and [q]. *)
+(** Point addition. [add p q] returns the result of the addition of [p] and [q]. *)
 
 val double : t -> t
 (** Point doubling. [double p] returns the result of doubling [p]. *)
