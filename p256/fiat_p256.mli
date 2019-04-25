@@ -1,6 +1,7 @@
 (** A point on the P-256 curve (public key). *)
 type point
 
+(** The type for point parsing errors. *)
 type point_error = [
   `CoordinateTooLarge
   | `InvalidFormat
@@ -30,6 +31,7 @@ val point_to_cs : point -> Cstruct.t
 (** A scalar value. *)
 type scalar
 
+(** The type for scalar parsing errors. *)
 type scalar_error = [
   `InvalidLength
   | `InvalidRange
