@@ -1,5 +1,10 @@
 type t = Scalar of Cstruct.t
 
+type error = [
+  `InvalidLength
+  | `InvalidRange
+]
+
 let pp fmt (Scalar s) = Cstruct_util.pp_hex_le fmt s
 
 let is_in_range cs =
@@ -8,17 +13,21 @@ let is_in_range cs =
   Cstruct_util.compare_be cs zero > 0 && Cstruct_util.compare_be n cs > 0
 
 let of_cstruct cs =
-  if Cstruct.len cs <> 32 then Error "input has incorrect length"
+  if Cstruct.len cs <> 32 then Error `InvalidLength
   else if is_in_range cs then Ok (Scalar (Cstruct.rev cs))
-  else Error "input is not in [1; n-1]"
+  else Error `InvalidRange
 
 let of_hex h =
   let cs = Hex.to_cstruct h in
   of_cstruct cs
 
+let err_to_str = function
+  | `InvalidLength -> "input has incorrect length"
+  | `InvalidRange -> "input is not in [1; n-1]"
+
 let pp_err pp fmt = function
   | Error e ->
-      Format.fprintf fmt "Error: %s" e
+      Format.fprintf fmt "Error: %s" (err_to_str e)
   | Ok x ->
       pp fmt x
 
@@ -61,7 +70,7 @@ let of_hex_exn h =
   | Ok p ->
       p
   | Error e ->
-      Printf.ksprintf failwith "of_hex_exn: %s" e
+      Printf.ksprintf failwith "of_hex_exn: %s" (err_to_str e)
 
 let bit_at (Scalar s) i =
   let byte_num = i / 8 in

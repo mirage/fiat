@@ -1,12 +1,17 @@
 (** A scalar value strictly between 1 and n-1 where n is the group order. *)
 type t
 
-val of_cstruct : Cstruct.t -> (t, string) result
+type error = [
+  `InvalidLength
+  | `InvalidRange
+]
+
+val of_cstruct : Cstruct.t -> (t, error) result
 (** Read data from a cstruct.
     It should be 32 bytes long, in big endian format. Returns an error when the
     number is zero, or if it is larger than or equal to the group order. *)
 
-val of_hex : Hex.t -> (t, string) result
+val of_hex : Hex.t -> (t, error) result
 (** Like [of_cstruct] but read from hex data. *)
 
 val of_hex_exn : Hex.t -> t

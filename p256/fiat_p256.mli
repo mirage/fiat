@@ -30,11 +30,16 @@ val point_to_cs : point -> Cstruct.t
 (** A scalar value. *)
 type scalar
 
-val scalar_of_cs : Cstruct.t -> (scalar, string) result
+type scalar_error = [
+  `InvalidLength
+  | `InvalidRange
+]
+
+val scalar_of_cs : Cstruct.t -> (scalar, scalar_error) result
 (** Read data from a cstruct.
     It should be 32 bytes long, in big endian format. *)
 
-val scalar_of_hex : Hex.t -> (scalar, string) result
+val scalar_of_hex : Hex.t -> (scalar, scalar_error) result
 (** Like [scalar_of_cs] but read from hex data. *)
 
 val dh : scalar:scalar -> point:point -> Cstruct.t

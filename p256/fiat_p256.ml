@@ -46,6 +46,8 @@ let point_to_cs = Point.to_cstruct
 
 type scalar = Scalar.t
 
+type scalar_error = Scalar.error
+
 let scalar_of_hex = Scalar.of_hex
 
 let scalar_of_cs = Scalar.of_cstruct
