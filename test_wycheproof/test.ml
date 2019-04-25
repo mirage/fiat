@@ -26,30 +26,17 @@ let ( >>= ) xr f =
   | Ok x ->
       f x
 
-let point_error_to_string = function
-  | `CoordinateTooLarge -> "coordinate out of range"
-  | `InvalidFormat -> "invalid format"
-  | `InvalidLength -> "invalid length"
-  | `NotOnCurve -> "point is not on curve"
-
-let scalar_error_to_string = function
-  | `InvalidLength -> "input has incorrect length"
-  | `InvalidRange -> "input is not in [1; n-1]"
-
-let to_string_result ~prefix ~err_to_str = function
-  | Ok _ as ok -> ok
-  | Error e -> 
-    let msg = Printf.sprintf "%s : %s" 
-      prefix 
-      (err_to_str e) 
-    in Error msg
+let to_string_result ~pp_error = function
+  | Ok _ as ok ->
+      ok
+  | Error e ->
+      let msg = Format.asprintf "%a" pp_error e in
+      Error msg
 
 let parse_point s =
   parse_asn1 s
   >>= fun payload ->
-  to_string_result 
-    ~prefix:"cannot parse point" 
-    ~err_to_str:point_error_to_string
+  to_string_result ~pp_error:Fiat_p256.pp_point_error
     (Fiat_p256.point_of_hex (Hex.of_string payload))
 
 let strip_leading_zeroes cs =
@@ -79,10 +66,8 @@ let pad ~total_len cs =
 let parse_scalar s =
   let stripped = strip_leading_zeroes (Cstruct.of_string s) in
   pad ~total_len:32 (Cstruct.rev stripped)
-  >>= fun cs -> 
-    to_string_result
-    ~prefix:"cannot parse scalar"
-    ~err_to_str:scalar_error_to_string
+  >>= fun cs ->
+  to_string_result ~pp_error:Fiat_p256.pp_scalar_error
     (Fiat_p256.scalar_of_cs (Cstruct.rev cs))
 
 type test =

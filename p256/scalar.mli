@@ -1,10 +1,11 @@
 (** A scalar value strictly between 1 and n-1 where n is the group order. *)
 type t
 
-type error = [
-  `InvalidLength
-  | `InvalidRange
-]
+type error =
+  [ `InvalidLength
+  | `InvalidRange ]
+
+val pp_error : Format.formatter -> error -> unit
 
 val of_cstruct : Cstruct.t -> (t, error) result
 (** Read data from a cstruct.

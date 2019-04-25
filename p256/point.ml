@@ -3,12 +3,24 @@ type t =
   ; f_y : Fe.t
   ; f_z : Fe.t }
 
-type error = [
-  `CoordinateTooLarge
+type error =
+  [ `CoordinateTooLarge
   | `InvalidFormat
   | `InvalidLength
-  | `NotOnCurve
-]
+  | `NotOnCurve ]
+
+let error_to_string = function
+  | `CoordinateTooLarge ->
+      "coordinate out of range"
+  | `InvalidFormat ->
+      "invalid format"
+  | `InvalidLength ->
+      "invalid length"
+  | `NotOnCurve ->
+      "point is not on curve"
+
+let pp_error fmt e =
+  Format.fprintf fmt "Cannot parse point: %s" (error_to_string e)
 
 let at_infinity () =
   let f_x = Fe.one () in
@@ -45,12 +57,10 @@ let check_coordinate cs =
 let validate_finite_point ~x ~y =
   match (check_coordinate x, check_coordinate y) with
   | Some f_x, Some f_y ->
-    if is_solution_to_curve_equation ~x:f_x ~y:f_y
-    then
-      let f_z = Fe.one () in
-      Ok {f_x; f_y; f_z}
-    else
-      Error `NotOnCurve
+      if is_solution_to_curve_equation ~x:f_x ~y:f_y then
+        let f_z = Fe.one () in
+        Ok {f_x; f_y; f_z}
+      else Error `NotOnCurve
   | _ ->
       Error `CoordinateTooLarge
 
@@ -102,10 +112,11 @@ let of_cstruct cs =
       let x = Cstruct.sub cs 1 32 in
       let y = Cstruct.sub cs 33 32 in
       validate_finite_point ~x ~y
-  | Some 0x00, _ 
-  | Some 0x04, _ ->
+  | Some 0x00, _
+   |Some 0x04, _ ->
       Error `InvalidLength
-  | _, _ -> Error `InvalidFormat
+  | _, _ ->
+      Error `InvalidFormat
 
 let of_hex h = of_cstruct (Hex.to_cstruct h)
 

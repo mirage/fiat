@@ -38,6 +38,8 @@ type point = Point.t
 
 type point_error = Point.error
 
+let pp_point_error = Point.pp_error
+
 let point_of_hex = Point.of_hex
 
 let point_of_cs = Point.of_cstruct
@@ -47,6 +49,8 @@ let point_to_cs = Point.to_cstruct
 type scalar = Scalar.t
 
 type scalar_error = Scalar.error
+
+let pp_scalar_error = Scalar.pp_error
 
 let scalar_of_hex = Scalar.of_hex
 

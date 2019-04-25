@@ -2,12 +2,13 @@
     It is backed by [Fe.t], and as such, is mutable. *)
 type t
 
-type error = [
-  `CoordinateTooLarge
+type error =
+  [ `CoordinateTooLarge
   | `InvalidFormat
   | `InvalidLength
-  | `NotOnCurve
-]
+  | `NotOnCurve ]
+
+val pp_error : Format.formatter -> error -> unit
 
 val at_infinity : unit -> t
 (** The point at infinity *)

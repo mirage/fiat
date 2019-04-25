@@ -2,12 +2,14 @@
 type point
 
 (** The type for point parsing errors. *)
-type point_error = [
-  `CoordinateTooLarge
+type point_error =
+  [ `CoordinateTooLarge
   | `InvalidFormat
   | `InvalidLength
-  | `NotOnCurve
-]
+  | `NotOnCurve ]
+
+val pp_point_error : Format.formatter -> point_error -> unit
+(** Pretty printer for point parsing errors *)
 
 val point_of_cs : Cstruct.t -> (point, point_error) result
 (** Convert from cstruct. The format is the uncompressed format described in
@@ -32,10 +34,12 @@ val point_to_cs : point -> Cstruct.t
 type scalar
 
 (** The type for scalar parsing errors. *)
-type scalar_error = [
-  `InvalidLength
-  | `InvalidRange
-]
+type scalar_error =
+  [ `InvalidLength
+  | `InvalidRange ]
+
+val pp_scalar_error : Format.formatter -> scalar_error -> unit
+(** Pretty printer for scalar parsing errors *)
 
 val scalar_of_cs : Cstruct.t -> (scalar, scalar_error) result
 (** Read data from a cstruct.
