@@ -36,6 +36,8 @@ let%expect_test "dh" =
 
 type point = Point.t
 
+type point_error = Point.error
+
 let point_of_hex = Point.of_hex
 
 let point_of_cs = Point.of_cstruct

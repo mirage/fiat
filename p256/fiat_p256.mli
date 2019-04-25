@@ -1,7 +1,14 @@
 (** A point on the P-256 curve (public key). *)
 type point
 
-val point_of_cs : Cstruct.t -> point option
+type point_error = [
+  `CoordinateTooLarge
+  | `InvalidFormat
+  | `InvalidLength
+  | `NotOnCurve
+]
+
+val point_of_cs : Cstruct.t -> (point, point_error) result
 (** Convert from cstruct. The format is the uncompressed format described in
     SEC1, section 2.3.4, that is to say:
 
@@ -14,7 +21,7 @@ val point_of_cs : Cstruct.t -> point option
     @see <http://www.secg.org/sec1-v2.pdf>
 *)
 
-val point_of_hex : Hex.t -> point option
+val point_of_hex : Hex.t -> (point, point_error) result
 (** Convert a point from hex. See [point_of_cs]. *)
 
 val point_to_cs : point -> Cstruct.t

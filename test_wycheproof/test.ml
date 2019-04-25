@@ -2,12 +2,6 @@ open Wycheproof
 
 let hex = Alcotest.testable Wycheproof.pp_hex Wycheproof.equal_hex
 
-let result_of_option ~msg = function
-  | None ->
-      Error msg
-  | Some x ->
-      Ok x
-
 let parse_asn1 s =
   let cs = Cstruct.of_string s in
   let seq2 a b = Asn.S.(sequence2 (required a) (required b)) in
@@ -32,10 +26,26 @@ let ( >>= ) xr f =
   | Ok x ->
       f x
 
+let point_error_to_string = function
+  | `CoordinateTooLarge -> "coordinate out of range"
+  | `InvalidFormat -> "invalid format"
+  | `InvalidLength -> "invalid length"
+  | `NotOnCurve -> "point is not on curve"
+
+let to_string_result ~prefix ~err_to_str = function
+  | Ok _ as ok -> ok
+  | Error e -> 
+    let msg = Printf.sprintf "%s : %s" 
+      prefix 
+      (err_to_str e) 
+    in Error msg
+
 let parse_point s =
   parse_asn1 s
   >>= fun payload ->
-  result_of_option ~msg:"cannot parse point"
+  to_string_result 
+    ~prefix:"cannot parse point" 
+    ~err_to_str:point_error_to_string
     (Fiat_p256.point_of_hex (Hex.of_string payload))
 
 let strip_leading_zeroes cs =
