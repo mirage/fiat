@@ -13,7 +13,11 @@ val add : t -> t -> t
 val double : t -> t
 (** Point doubling. [double p] returns the result of doubling [p]. *)
 
-val of_cstruct : Cstruct.t -> (t, Error.point_error) result
+val of_cstruct :
+     Cstruct.t
+  -> ( t
+     , [> `InvalidFormat | `InvalidLength | `InvalidRange | `NotOnCurve] )
+     result
 (** Convert from cstruct. The format is the uncompressed format described in
     SEC1, section 2.3.4, that is to say:
 
@@ -26,7 +30,11 @@ val of_cstruct : Cstruct.t -> (t, Error.point_error) result
     @see <http://www.secg.org/sec1-v2.pdf>
 *)
 
-val of_hex : Hex.t -> (t, Error.point_error) result
+val of_hex :
+     Hex.t
+  -> ( t
+     , [> `InvalidFormat | `InvalidLength | `InvalidRange | `NotOnCurve] )
+     result
 (** Convert from hex. See [of_cstruct]. *)
 
 val of_hex_exn : Hex.t -> t
