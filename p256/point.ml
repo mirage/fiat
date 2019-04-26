@@ -135,8 +135,8 @@ let of_hex_exn h =
   match of_hex h with
   | Ok p ->
       p
-  | Error _ ->
-      failwith "of_hex_exn"
+  | Error e ->
+      failwith (Format.asprintf "of_hex_exn: %a" Error.pp_point_error e)
 
 let to_affine p =
   if is_infinity p then None
