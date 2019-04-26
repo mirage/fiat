@@ -3,6 +3,25 @@ type t =
   ; f_y : Fe.t
   ; f_z : Fe.t }
 
+type error =
+  [ `CoordinateTooLarge
+  | `InvalidFormat
+  | `InvalidLength
+  | `NotOnCurve ]
+
+let error_to_string = function
+  | `CoordinateTooLarge ->
+      "coordinate out of range"
+  | `InvalidFormat ->
+      "invalid format"
+  | `InvalidLength ->
+      "invalid length"
+  | `NotOnCurve ->
+      "point is not on curve"
+
+let pp_error fmt e =
+  Format.fprintf fmt "Cannot parse point: %s" (error_to_string e)
+
 let at_infinity () =
   let f_x = Fe.one () in
   let f_y = Fe.one () in
@@ -37,23 +56,24 @@ let check_coordinate cs =
 *)
 let validate_finite_point ~x ~y =
   match (check_coordinate x, check_coordinate y) with
-  | Some f_x, Some f_y
-    when is_solution_to_curve_equation ~x:f_x ~y:f_y ->
-      let f_z = Fe.one () in
-      Some {f_x; f_y; f_z}
+  | Some f_x, Some f_y ->
+      if is_solution_to_curve_equation ~x:f_x ~y:f_y then
+        let f_z = Fe.one () in
+        Ok {f_x; f_y; f_z}
+      else Error `NotOnCurve
   | _ ->
-      None
+      Error `CoordinateTooLarge
 
 let%expect_test "validate_finite_point" =
-  let is_some = function
-    | Some _ ->
+  let is_ok = function
+    | Ok _ ->
         true
-    | None ->
+    | Error _ ->
         false
   in
   let test ~x ~y =
     Printf.printf "%b"
-      (is_some
+      (is_ok
          (validate_finite_point ~x:(Hex.to_cstruct x) ~y:(Hex.to_cstruct y)))
   in
   test
@@ -87,13 +107,16 @@ let first_byte cs =
 let of_cstruct cs =
   match (first_byte cs, Cstruct.len cs) with
   | Some 0x00, 1 ->
-      Some (at_infinity ())
+      Ok (at_infinity ())
   | Some 0x04, 65 ->
       let x = Cstruct.sub cs 1 32 in
       let y = Cstruct.sub cs 33 32 in
       validate_finite_point ~x ~y
-  | _ ->
-      None
+  | Some 0x00, _
+   |Some 0x04, _ ->
+      Error `InvalidLength
+  | _, _ ->
+      Error `InvalidFormat
 
 let of_hex h = of_cstruct (Hex.to_cstruct h)
 
@@ -101,9 +124,9 @@ let%expect_test "of_hex" =
   let test hex =
     let ok =
       match of_hex hex with
-      | Some _ ->
+      | Ok _ ->
           true
-      | None ->
+      | Error _ ->
           false
     in
     Printf.printf "%b" ok
@@ -127,9 +150,9 @@ let%expect_test "of_hex" =
 
 let of_hex_exn h =
   match of_hex h with
-  | Some p ->
+  | Ok p ->
       p
-  | None ->
+  | Error _ ->
       failwith "of_hex_exn"
 
 let to_affine p =

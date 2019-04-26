@@ -1,6 +1,14 @@
 (** A Point on the P-256 curve. *)
 type t
 
+type error =
+  [ `CoordinateTooLarge
+  | `InvalidFormat
+  | `InvalidLength
+  | `NotOnCurve ]
+
+val pp_error : Format.formatter -> error -> unit
+
 val at_infinity : unit -> t
 (** The point at infinity *)
 
@@ -10,7 +18,7 @@ val add : t -> t -> t
 val double : t -> t
 (** Point doubling. [double p] returns the result of doubling [p]. *)
 
-val of_cstruct : Cstruct.t -> t option
+val of_cstruct : Cstruct.t -> (t, error) result
 (** Convert from cstruct. The format is the uncompressed format described in
     SEC1, section 2.3.4, that is to say:
 
@@ -23,7 +31,7 @@ val of_cstruct : Cstruct.t -> t option
     @see <http://www.secg.org/sec1-v2.pdf>
 *)
 
-val of_hex : Hex.t -> t option
+val of_hex : Hex.t -> (t, error) result
 (** Convert from hex. See [of_cstruct]. *)
 
 val of_hex_exn : Hex.t -> t

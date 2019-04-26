@@ -1,5 +1,18 @@
 type t = Scalar of Cstruct.t
 
+type error =
+  [ `InvalidLength
+  | `InvalidRange ]
+
+let error_to_string = function
+  | `InvalidLength ->
+      "input has incorrect length"
+  | `InvalidRange ->
+      "input is not in [1; n-1]"
+
+let pp_error fmt e =
+  Format.fprintf fmt "Cannot parse scalar: %s" (error_to_string e)
+
 let pp fmt (Scalar s) = Cstruct_util.pp_hex_le fmt s
 
 let is_in_range cs =
@@ -8,9 +21,9 @@ let is_in_range cs =
   Cstruct_util.compare_be cs zero > 0 && Cstruct_util.compare_be n cs > 0
 
 let of_cstruct cs =
-  if Cstruct.len cs <> 32 then Error "input has incorrect length"
+  if Cstruct.len cs <> 32 then Error `InvalidLength
   else if is_in_range cs then Ok (Scalar (Cstruct.rev cs))
-  else Error "input is not in [1; n-1]"
+  else Error `InvalidRange
 
 let of_hex h =
   let cs = Hex.to_cstruct h in
@@ -18,7 +31,7 @@ let of_hex h =
 
 let pp_err pp fmt = function
   | Error e ->
-      Format.fprintf fmt "Error: %s" e
+      pp_error fmt e
   | Ok x ->
       pp fmt x
 
@@ -38,10 +51,10 @@ let%expect_test "of_hex" =
   test
     (`Hex
       "2000000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f");
-  [%expect {| Error: input has incorrect length |}];
+  [%expect {| Cannot parse scalar: input has incorrect length |}];
   test
     (`Hex "0000000000000000000000000000000000000000000000000000000000000000");
-  [%expect {| Error: input is not in [1; n-1] |}];
+  [%expect {| Cannot parse scalar: input is not in [1; n-1] |}];
   test
     (`Hex
       (* n-1 *)
@@ -49,19 +62,19 @@ let%expect_test "of_hex" =
   [%expect
     {| ffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632550 |}];
   test Parameters.n;
-  [%expect {| Error: input is not in [1; n-1] |}];
+  [%expect {| Cannot parse scalar: input is not in [1; n-1] |}];
   test
     (`Hex
       (* n+1 *)
       "FFFFFFFF00000000FFFFFFFFFFFFFFFFBCE6FAADA7179E84F3B9CAC2FC632552");
-  [%expect {| Error: input is not in [1; n-1] |}]
+  [%expect {| Cannot parse scalar: input is not in [1; n-1] |}]
 
 let of_hex_exn h =
   match of_hex h with
   | Ok p ->
       p
   | Error e ->
-      Printf.ksprintf failwith "of_hex_exn: %s" e
+      Printf.ksprintf failwith "of_hex_exn: %s" (error_to_string e)
 
 let bit_at (Scalar s) i =
   let byte_num = i / 8 in
