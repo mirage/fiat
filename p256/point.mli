@@ -1,17 +1,14 @@
-(** A Point on the P-256 curve.
-    It is backed by [Fe.t], and as such, is mutable. *)
+(** A Point on the P-256 curve. *)
 type t
 
 val at_infinity : unit -> t
 (** The point at infinity *)
 
 val add : t -> t -> t
-(** Point addition. [add dst p q] adds [p] and [q], and stores the result
-    into [dst]. *)
+(** Point addition. [add p q] returns the result of the addition of [p] and [q]. *)
 
 val double : t -> t
-(** Point doubling. [double dst p q] doubles [p], and stores the result
-    into [dst]. *)
+(** Point doubling. [double p] returns the result of doubling [p]. *)
 
 val of_cstruct : Cstruct.t -> t option
 (** Convert from cstruct. The format is the uncompressed format described in
