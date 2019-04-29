@@ -1,13 +1,13 @@
 type point_error =
-  [ `InvalidFormat
-  | `InvalidRange
-  | `InvalidLength
-  | `NotOnCurve
-  | `AtInfinity ]
+  [ `Invalid_format
+  | `Invalid_range
+  | `Invalid_length
+  | `Not_on_curve
+  | `At_infinity ]
 
 type scalar_error =
-  [ `InvalidLength
-  | `InvalidRange ]
+  [ `Invalid_length
+  | `Invalid_range ]
 
 val pp_point_error : Format.formatter -> point_error -> unit
 

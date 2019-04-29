@@ -8,9 +8,9 @@ let is_in_range cs =
   Cstruct_util.compare_be cs zero > 0 && Cstruct_util.compare_be n cs > 0
 
 let of_cstruct cs =
-  if Cstruct.len cs <> 32 then Error `InvalidLength
+  if Cstruct.len cs <> 32 then Error `Invalid_length
   else if is_in_range cs then Ok (Scalar (Cstruct.rev cs))
-  else Error `InvalidRange
+  else Error `Invalid_range
 
 let of_hex h =
   let cs = Hex.to_cstruct h in

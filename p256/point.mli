@@ -16,7 +16,7 @@ val double : t -> t
 val of_cstruct :
      Cstruct.t
   -> ( t
-     , [> `InvalidFormat | `InvalidLength | `InvalidRange | `NotOnCurve] )
+     , [> `Invalid_format | `Invalid_length | `Invalid_range | `Not_on_curve] )
      result
 (** Convert from cstruct. The format is the uncompressed format described in
     SEC1, section 2.3.4, that is to say:
@@ -33,7 +33,7 @@ val of_cstruct :
 val of_hex :
      Hex.t
   -> ( t
-     , [> `InvalidFormat | `InvalidLength | `InvalidRange | `NotOnCurve] )
+     , [> `Invalid_format | `Invalid_length | `Invalid_range | `Not_on_curve] )
      result
 (** Convert from hex. See [of_cstruct]. *)
 

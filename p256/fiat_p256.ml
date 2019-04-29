@@ -45,7 +45,7 @@ let check_point = function
     when not (Point.is_infinity p) ->
       Ok p
   | Ok _ ->
-      Error `AtInfinity
+      Error `At_infinity
   | Error _ as e ->
       e
 

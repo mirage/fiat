@@ -1,24 +1,24 @@
 type point_error =
-  [ `InvalidFormat
-  | `InvalidLength
-  | `InvalidRange
-  | `NotOnCurve
-  | `AtInfinity ]
+  [ `Invalid_format
+  | `Invalid_length
+  | `Invalid_range
+  | `Not_on_curve
+  | `At_infinity ]
 
 type scalar_error =
-  [ `InvalidLength
-  | `InvalidRange ]
+  [ `Invalid_length
+  | `Invalid_range ]
 
 let error_to_string = function
-  | `InvalidFormat ->
+  | `Invalid_format ->
       "invalid format"
-  | `NotOnCurve ->
+  | `Not_on_curve ->
       "point is not on curve"
-  | `AtInfinity ->
+  | `At_infinity ->
       "point is at infinity"
-  | `InvalidLength ->
+  | `Invalid_length ->
       "invalid length"
-  | `InvalidRange ->
+  | `Invalid_range ->
       "invalid range"
 
 let pp_point_error fmt e =
