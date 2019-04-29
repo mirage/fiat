@@ -43,9 +43,9 @@ let validate_finite_point ~x ~y =
       if is_solution_to_curve_equation ~x:f_x ~y:f_y then
         let f_z = Fe.one () in
         Ok {f_x; f_y; f_z}
-      else Error `NotOnCurve
+      else Error `Not_on_curve
   | _ ->
-      Error `InvalidRange
+      Error `Invalid_range
 
 let%expect_test "validate_finite_point" =
   let is_ok = function
@@ -97,9 +97,9 @@ let of_cstruct cs =
       validate_finite_point ~x ~y
   | Some 0x00, _
    |Some 0x04, _ ->
-      Error `InvalidLength
+      Error `Invalid_length
   | _, _ ->
-      Error `InvalidFormat
+      Error `Invalid_format
 
 let of_hex h = of_cstruct (Hex.to_cstruct h)
 

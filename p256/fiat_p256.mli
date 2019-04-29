@@ -3,11 +3,11 @@ type point
 
 (** The type for point parsing errors. *)
 type point_error =
-  [ `InvalidRange
-  | `InvalidFormat
-  | `InvalidLength
-  | `NotOnCurve
-  | `AtInfinity ]
+  [ `Invalid_range
+  | `Invalid_format
+  | `Invalid_length
+  | `Not_on_curve
+  | `At_infinity ]
 
 val pp_point_error : Format.formatter -> point_error -> unit
 (** Pretty printer for point parsing errors *)
@@ -37,8 +37,8 @@ type scalar
 
 (** The type for scalar parsing errors. *)
 type scalar_error =
-  [ `InvalidLength
-  | `InvalidRange ]
+  [ `Invalid_length
+  | `Invalid_range ]
 
 val pp_scalar_error : Format.formatter -> scalar_error -> unit
 (** Pretty printer for scalar parsing errors *)
