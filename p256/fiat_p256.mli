@@ -1,3 +1,14 @@
+(** Diffie-Hellman key exchange over P-256 (secp256r1) curve.
+    This implementation uses C code from {{https://github.com/mit-plv/fiat-crypto}
+    Fiat-crypto project}.
+
+    @see <https://www.secg.org/SEC2-Ver-1.0.pdf> SEC2 : Recommended Elliptic
+    Curve Domain Parameters, section 2.7.2 - curve parameters
+    @see <https://tools.ietf.org/html/rfc8446#section-7.4.2> RFC8446, "The
+    Transport Layer Security (TLS) Protocol Version 1.3", section 7.4.2 - how to
+    use this in the context of TLS 1.3.
+*)
+
 (** A point on the P-256 curve (public key), that is not the point at infinity. *)
 type point
 

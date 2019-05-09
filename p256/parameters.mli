@@ -1,4 +1,4 @@
-(** Curve parameters.
+(** Curve parameters as defined in {{https://www.secg.org/SEC2-Ver-1.0.pdf}SEC2}.
     They are stored as [Hex.t] because [Fe.t] and [Cstruct.t] are
     mutable. *)
 
