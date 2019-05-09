@@ -9,8 +9,8 @@ env:
     - PACKAGE=fiat-p256
     - DISTRO=alpine-3.7
   matrix:
+    - HUB_USER=nathanreb OCAMLFORMAT=0.9
     - OCAML_VERSION=4.04
     - OCAML_VERSION=4.05
     - OCAML_VERSION=4.06
     - OCAML_VERSION=4.07
-    - HUB_USER=nathanreb OCAMLFORMAT=0.9
