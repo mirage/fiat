@@ -6,7 +6,7 @@ install: wget https://raw.githubusercontent.com/ocaml/ocaml-travisci-skeleton/ma
 script: bash ./.travis-docker.sh
 env:
   global:
-    - PACKAGE=fiat_p256
+    - PACKAGE=fiat-p256
     - DISTRO=alpine-3.7
   matrix:
     - OCAML_VERSION=4.04
