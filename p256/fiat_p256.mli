@@ -15,15 +15,13 @@ val pp_point_error : Format.formatter -> point_error -> unit
 val point_of_cs : Cstruct.t -> (point, point_error) result
 (** Convert from cstruct. Refuses the point at infinity.
     The format is the uncompressed format described in
-    SEC1, section 2.3.4, that is to say:
+    {{http://www.secg.org/sec1-v2.pdf}SEC1}, section 2.3.4, that is to say:
 
     - the point at infinity is the single byte "00".
     - for a point (x, y) not at infinity, the format is:
       - the byte "04"
       - x serialized in big endian format, padded to 32 bytes.
       - y serialized in big endian format, padded to 32 bytes.
-
-    @see <http://www.secg.org/sec1-v2.pdf>
 *)
 
 val point_of_hex : Hex.t -> (point, point_error) result
