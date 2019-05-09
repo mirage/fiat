@@ -2,7 +2,7 @@ language: c
 sudo: false
 services:
   - docker
-install: wget https://raw.githubusercontent.com/ocaml/ocaml-travisci-skeleton/master/.travis-docker.sh
+install: wget https://raw.githubusercontent.com/NathanReb/ocaml-ci-scripts/check-formatting/.travis-docker.sh
 script: bash ./.travis-docker.sh
 env:
   global:
@@ -13,3 +13,4 @@ env:
     - OCAML_VERSION=4.05
     - OCAML_VERSION=4.06
     - OCAML_VERSION=4.07
+    - HUB_USER=nathanreb OCAMLFORMAT=0.9
