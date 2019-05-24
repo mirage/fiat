@@ -29,7 +29,7 @@ let is_solution_to_curve_equation ~x ~y =
 
 let check_coordinate cs =
   let p = Hex.to_cstruct Parameters.p in
-  if Cstruct_util.compare_be cs p >= 0 then None
+  if Cstruct_util.compare_be_variable_time cs p >= 0 then None
   else Some (Fe.from_be_cstruct cs)
 
 (** Convert cstruct coordinates to a finite point ensuring:

@@ -5,7 +5,7 @@ let pp_hex_le fmt cs =
     Format.fprintf fmt "%02x" byte
   done
 
-let compare_be a b =
+let compare_be_variable_time a b =
   let first_diff = ref None in
   let a_len = Cstruct.len a in
   let b_len = Cstruct.len b in
@@ -25,8 +25,8 @@ let compare_be a b =
   | Some d ->
       d
 
-let%expect_test "compare_be" =
-  let test a b = print_int (compare_be a b) in
+let%expect_test "compare_be_variable_time" =
+  let test a b = print_int (compare_be_variable_time a b) in
   test (Cstruct.of_string "aa") (Cstruct.of_string "ab");
   [%expect {| -1 |}];
   test (Cstruct.of_string "ab") (Cstruct.of_string "aa");

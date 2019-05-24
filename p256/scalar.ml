@@ -5,7 +5,8 @@ let pp fmt (Scalar s) = Cstruct_util.pp_hex_le fmt s
 let is_in_range cs =
   let zero = Cstruct.create 32 in
   let n = Hex.to_cstruct Parameters.n in
-  Cstruct_util.compare_be cs zero > 0 && Cstruct_util.compare_be n cs > 0
+  Cstruct_util.compare_be_variable_time cs zero > 0
+  && Cstruct_util.compare_be_variable_time n cs > 0
 
 let of_cstruct cs =
   if Cstruct.len cs <> 32 then Error `Invalid_length
