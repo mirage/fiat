@@ -26,18 +26,15 @@ let ( >>= ) xr f =
   | Ok x ->
       f x
 
+let parse_point p =
+  parse_asn1 p >>= fun h -> Ok Hex.(to_cstruct (of_string h))
+
 let to_string_result ~pp_error = function
   | Ok _ as ok ->
       ok
   | Error e ->
       let msg = Format.asprintf "%a" pp_error e in
       Error msg
-
-let parse_point s =
-  parse_asn1 s
-  >>= fun payload ->
-  to_string_result ~pp_error:Fiat_p256.pp_point_error
-    (Fiat_p256.point_of_hex (Hex.of_string payload))
 
 let strip_leading_zeroes cs =
   let first_nonzero_index = ref None in
@@ -65,19 +62,27 @@ let pad ~total_len cs =
 
 let parse_scalar s =
   let stripped = strip_leading_zeroes (Cstruct.of_string s) in
-  pad ~total_len:32 (Cstruct.rev stripped)
-  >>= fun cs ->
-  to_string_result ~pp_error:Fiat_p256.pp_scalar_error
-    (Fiat_p256.scalar_of_cs (Cstruct.rev cs))
+  pad ~total_len:32 (Cstruct.rev stripped) >>= fun cs -> Ok (Cstruct.rev cs)
 
 type test =
-  { point : Fiat_p256.point
-  ; scalar : Fiat_p256.scalar
+  { public_key : Cstruct.t
+  ; raw_private_key : Cstruct.t
   ; expected : string }
 
-let interpret_test {point; scalar; expected} () =
-  let got = Cstruct.to_string (Fiat_p256.dh ~scalar ~point) in
-  Alcotest.check hex __LOC__ expected got
+let perform_key_exchange ~public_key ~raw_private_key =
+  let open Fiat_p256 in
+  to_string_result ~pp_error:pp_scalar_error (scalar_of_cs raw_private_key)
+  >>= fun private_key ->
+  to_string_result ~pp_error:pp_point_error
+    (key_exchange ~private_key public_key)
+
+let interpret_test ~tcId {public_key; raw_private_key; expected} () =
+  match perform_key_exchange ~public_key ~raw_private_key with
+  | Ok cs ->
+      let got = Cstruct.to_string cs in
+      Alcotest.check hex __LOC__ expected got
+  | Error err ->
+      Printf.ksprintf Alcotest.fail "While parsing %d: %s" tcId err
 
 type invalid_test =
   { public : string
@@ -91,7 +96,11 @@ let is_ok = function
 
 let interpret_invalid_test {public; private_} () =
   let result =
-    parse_point public >>= fun _ -> parse_scalar private_ >>= fun _ -> Ok ()
+    parse_point public
+    >>= fun public_key ->
+    parse_scalar private_
+    >>= fun raw_private_key ->
+    perform_key_exchange ~public_key ~raw_private_key
   in
   Alcotest.check Alcotest.bool __LOC__ false (is_ok result)
 
@@ -112,9 +121,10 @@ let make_test test =
       Ok Skip
   | Valid ->
       parse_point test.public
-      >>= fun point ->
+      >>= fun public_key ->
       parse_scalar test.private_
-      >>= fun scalar -> Ok (Test {point; scalar; expected = test.shared})
+      >>= fun raw_private_key ->
+      Ok (Test {public_key; raw_private_key; expected = test.shared})
 
 let concat_map f l = List.map f l |> List.concat
 
@@ -122,7 +132,7 @@ let to_tests x =
   let name = Printf.sprintf "%d - %s" x.tcId x.comment in
   match make_test x with
   | Ok (Test t) ->
-      [(name, `Quick, interpret_test t)]
+      [(name, `Quick, interpret_test ~tcId:x.tcId t)]
   | Ok (Invalid_test t) ->
       [(name, `Quick, interpret_invalid_test t)]
   | Ok Skip ->
