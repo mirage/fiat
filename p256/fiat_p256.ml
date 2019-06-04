@@ -34,8 +34,6 @@ let%expect_test "dh" =
   [%expect
     {| a7666bcc3818472194460f7df22d80a5886da0e1679eac930175ce1ff733c7ca |}]
 
-type point = Point.t
-
 type point_error = Error.point_error
 
 let pp_point_error = Error.pp_point_error
@@ -49,8 +47,6 @@ let check_point = function
   | Error _ as e ->
       e
 
-let point_of_hex h = check_point (Point.of_hex h)
-
 let point_of_cs c = check_point (Point.of_cstruct c)
 
 let point_to_cs = Point.to_cstruct
@@ -60,8 +56,6 @@ type scalar = Scalar.t
 type scalar_error = Error.scalar_error
 
 let pp_scalar_error = Error.pp_scalar_error
-
-let scalar_of_hex = Scalar.of_hex
 
 let scalar_of_cs = Scalar.of_cstruct
 
