@@ -59,3 +59,8 @@ val public : scalar -> point
 (** Compute the public key corresponding to a given private key. Internally,
     this multiplies the generator by the scalar.
     Given the invariant on [scalar], the result can't be the point at infinity. *)
+
+val generate_key : rng:(int -> Cstruct.t) -> scalar * Cstruct.t
+
+val key_exchange :
+  private_key:scalar -> Cstruct.t -> (Cstruct.t, point_error) result
