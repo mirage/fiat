@@ -65,23 +65,25 @@ let scalar_of_hex = Scalar.of_hex
 
 let scalar_of_cs = Scalar.of_cstruct
 
-let rec generate_private_key ~rng () =
-  let candidate = rng 4 in
-  match scalar_of_cs candidate with
-  | Ok scalar ->
-      scalar
-  | Error _ ->
-      generate_private_key ~rng ()
+module Dhe = struct
+  let rec generate_private_key ~rng () =
+    let candidate = rng 4 in
+    match scalar_of_cs candidate with
+    | Ok scalar ->
+        scalar
+    | Error _ ->
+        generate_private_key ~rng ()
 
-let generate_key ~rng =
-  let private_key = generate_private_key ~rng () in
-  let public_key = public private_key in
-  let to_send = point_to_cs public_key in
-  (private_key, to_send)
+  let generate_key ~rng =
+    let private_key = generate_private_key ~rng () in
+    let public_key = public private_key in
+    let to_send = point_to_cs public_key in
+    (private_key, to_send)
 
-let key_exchange ~private_key received =
-  match point_of_cs received with
-  | Error _ as err ->
-      err
-  | Ok other_party_public_key ->
-      Ok (dh ~scalar:private_key ~point:other_party_public_key)
+  let key_exchange ~private_key received =
+    match point_of_cs received with
+    | Error _ as err ->
+        err
+    | Ok other_party_public_key ->
+        Ok (dh ~scalar:private_key ~point:other_party_public_key)
+end

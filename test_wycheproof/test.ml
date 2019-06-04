@@ -74,7 +74,7 @@ let perform_key_exchange ~public_key ~raw_private_key =
   to_string_result ~pp_error:pp_scalar_error (scalar_of_cs raw_private_key)
   >>= fun private_key ->
   to_string_result ~pp_error:pp_point_error
-    (key_exchange ~private_key public_key)
+    (Dhe.key_exchange ~private_key public_key)
 
 let interpret_test ~tcId {public_key; raw_private_key; expected} () =
   match perform_key_exchange ~public_key ~raw_private_key with

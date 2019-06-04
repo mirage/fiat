@@ -60,7 +60,18 @@ val public : scalar -> point
     this multiplies the generator by the scalar.
     Given the invariant on [scalar], the result can't be the point at infinity. *)
 
-val generate_key : rng:(int -> Cstruct.t) -> scalar * Cstruct.t
+module Dhe : sig
+  val generate_key : rng:(int -> Cstruct.t) -> scalar * Cstruct.t
+  (** [generate_key ~rng] generates a private and a public key for Ephemeral Diffie-Hellman.
+      The returned key pair MUST only be used for a single key exchange.
+      [rng] is the function used to repeteadly generate a private key until a valid candidate
+      is obtained. [rng]'s int parameter is the size of [Cstruct.t] to generate.
+      The generated private key is checked to be greater than zero and lower than the group
+      order meaning the public key cannot be the point at inifinity. *)
 
-val key_exchange :
-  private_key:scalar -> Cstruct.t -> (Cstruct.t, point_error) result
+  val key_exchange :
+    private_key:scalar -> Cstruct.t -> (Cstruct.t, point_error) result
+  (** [key_exchange ~private_key received_public_key] performs Diffie-Hellman key exchange
+      using your private key and the other party's public key. Returns the shared secret
+      or an error if the received public is invalid or is the point at infinity. *)
+end
