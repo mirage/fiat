@@ -49,8 +49,7 @@ let check_point = function
   | Error _ as e ->
       e
 
-let point_of_hex h =
-  check_point (Point.of_hex h)
+let point_of_hex h = check_point (Point.of_hex h)
 
 let point_of_cs c = check_point (Point.of_cstruct c)
 
