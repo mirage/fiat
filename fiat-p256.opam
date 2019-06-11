@@ -17,7 +17,7 @@ build: [
 depends: [
   "alcotest" {with-test}
   "asn1-combinators" {with-test}
-  "cstruct" {>= "3.5.0"}
+  "cstruct" {>= "3.5.0" & < "5.0.0"}
   "dune" {build & >= "1.6.0"}
   "hex"
   "hex" {with-test}
