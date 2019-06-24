@@ -51,20 +51,20 @@ let point_of_cs c = check_point (Point.of_cstruct c)
 
 let point_to_cs = Point.to_cstruct
 
-type scalar = Scalar.t
+type secret = Scalar.t
 
-type scalar_error = Error.scalar_error
+type secret_error = Error.scalar_error
 
-let pp_scalar_error = Error.pp_scalar_error
+let pp_secret_error = Error.pp_scalar_error
 
-let scalar_of_cs = Scalar.of_cstruct
+let secret_of_cs = Scalar.of_cstruct
 
 module Dhe = struct
   let rec generate_private_key ~rng () =
     let candidate = rng 4 in
-    match scalar_of_cs candidate with
-    | Ok scalar ->
-        scalar
+    match secret_of_cs candidate with
+    | Ok secret ->
+        secret
     | Error _ ->
         generate_private_key ~rng ()
 
@@ -74,10 +74,10 @@ module Dhe = struct
     let to_send = point_to_cs public_key in
     (private_key, to_send)
 
-  let key_exchange ~private_key received =
+  let key_exchange secret received =
     match point_of_cs received with
     | Error _ as err ->
         err
     | Ok other_party_public_key ->
-        Ok (dh ~scalar:private_key ~point:other_party_public_key)
+        Ok (dh ~scalar:secret ~point:other_party_public_key)
 end

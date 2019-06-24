@@ -60,7 +60,7 @@ let pad ~total_len cs =
   | pad_len ->
       Ok (Cstruct.append cs (Cstruct.create pad_len))
 
-let parse_scalar s =
+let parse_secret s =
   let stripped = strip_leading_zeroes (Cstruct.of_string s) in
   pad ~total_len:32 (Cstruct.rev stripped) >>= fun cs -> Ok (Cstruct.rev cs)
 
@@ -71,10 +71,10 @@ type test =
 
 let perform_key_exchange ~public_key ~raw_private_key =
   let open Fiat_p256 in
-  to_string_result ~pp_error:pp_scalar_error (scalar_of_cs raw_private_key)
-  >>= fun private_key ->
+  to_string_result ~pp_error:pp_secret_error (secret_of_cs raw_private_key)
+  >>= fun secret ->
   to_string_result ~pp_error:pp_point_error
-    (Dhe.key_exchange ~private_key public_key)
+    (Dhe.key_exchange secret public_key)
 
 let interpret_test ~tcId {public_key; raw_private_key; expected} () =
   match perform_key_exchange ~public_key ~raw_private_key with
@@ -98,7 +98,7 @@ let interpret_invalid_test {public; private_} () =
   let result =
     parse_point public
     >>= fun public_key ->
-    parse_scalar private_
+    parse_secret private_
     >>= fun raw_private_key ->
     perform_key_exchange ~public_key ~raw_private_key
   in
@@ -122,7 +122,7 @@ let make_test test =
   | Valid ->
       parse_point test.public
       >>= fun public_key ->
-      parse_scalar test.private_
+      parse_secret test.private_
       >>= fun raw_private_key ->
       Ok (Test {public_key; raw_private_key; expected = test.shared})
 
