@@ -59,25 +59,23 @@ let pp_secret_error = Error.pp_scalar_error
 
 let secret_of_cs = Scalar.of_cstruct
 
-module Dhe = struct
-  let rec generate_private_key ~rng () =
-    let candidate = rng 4 in
-    match secret_of_cs candidate with
-    | Ok secret ->
-        secret
-    | Error _ ->
-        generate_private_key ~rng ()
+let rec generate_private_key ~rng () =
+  let candidate = rng 4 in
+  match secret_of_cs candidate with
+  | Ok secret ->
+      secret
+  | Error _ ->
+      generate_private_key ~rng ()
 
-  let gen_key ~rng =
-    let private_key = generate_private_key ~rng () in
-    let public_key = public private_key in
-    let to_send = point_to_cs public_key in
-    (private_key, to_send)
+let gen_key ~rng =
+  let private_key = generate_private_key ~rng () in
+  let public_key = public private_key in
+  let to_send = point_to_cs public_key in
+  (private_key, to_send)
 
-  let key_exchange secret received =
-    match point_of_cs received with
-    | Error _ as err ->
-        err
-    | Ok other_party_public_key ->
-        Ok (dh ~scalar:secret ~point:other_party_public_key)
-end
+let key_exchange secret received =
+  match point_of_cs received with
+  | Error _ as err ->
+      err
+  | Ok other_party_public_key ->
+      Ok (dh ~scalar:secret ~point:other_party_public_key)

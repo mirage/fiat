@@ -12,21 +12,19 @@ val pp_error : Format.formatter -> error -> unit
 (** A scalar value. *)
 type secret
 
-module Dhe : sig
-  val gen_key : rng:(int -> Cstruct.t) -> secret * Cstruct.t
-  (** [gen_key ~rng] generates a private and a public key for Ephemeral Diffie-Hellman.
-      The returned key pair MUST only be used for a single key exchange.
-      [rng] is the function used to repeteadly generate a private key until a valid candidate
-      is obtained. [rng]'s int parameter is the size of the [Cstruct.t] to generate.
-      The generated private key is checked to be greater than zero and lower than the group
-      order meaning the public key cannot be the point at inifinity. *)
+val gen_key : rng:(int -> Cstruct.t) -> secret * Cstruct.t
+(** [gen_key ~rng] generates a private and a public key for Ephemeral Diffie-Hellman.
+    The returned key pair MUST only be used for a single key exchange.
+    [rng] is the function used to repeteadly generate a private key until a valid candidate
+    is obtained. [rng]'s int parameter is the size of the [Cstruct.t] to generate.
+    The generated private key is checked to be greater than zero and lower than the group
+    order meaning the public key cannot be the point at inifinity. *)
 
-  val key_exchange : secret -> Cstruct.t -> (Cstruct.t, error) result
-  (** [key_exchange ~private_key received_public_key] performs Diffie-Hellman key exchange
-      using your private key and the other party's public key. Returns the shared secret
-      or an error if the received public is invalid or is the point at infinity.
-      @see <http://www.secg.org/sec1-v2.pdf> for public key encoding format. *)
-end
+val key_exchange : secret -> Cstruct.t -> (Cstruct.t, error) result
+(** [key_exchange ~private_key received_public_key] performs Diffie-Hellman key exchange
+    using your private key and the other party's public key. Returns the shared secret
+    or an error if the received public is invalid or is the point at infinity.
+    @see <http://www.secg.org/sec1-v2.pdf> for public key encoding format. *)
 
 (**/**)
 
