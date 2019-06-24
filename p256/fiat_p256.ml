@@ -34,9 +34,9 @@ let%expect_test "dh" =
   [%expect
     {| a7666bcc3818472194460f7df22d80a5886da0e1679eac930175ce1ff733c7ca |}]
 
-type point_error = Error.point_error
+type error = Error.point_error
 
-let pp_point_error = Error.pp_point_error
+let pp_error = Error.pp_point_error
 
 let check_point = function
   | Ok p

@@ -1,13 +1,13 @@
-(** The type for point parsing errors. *)
-type point_error =
+(** The type for public key parsing errors. *)
+type error =
   [ `Invalid_range
   | `Invalid_format
   | `Invalid_length
   | `Not_on_curve
   | `At_infinity ]
 
-val pp_point_error : Format.formatter -> point_error -> unit
-(** Pretty printer for point parsing errors *)
+val pp_error : Format.formatter -> error -> unit
+(** Pretty printer for public key parsing errors *)
 
 (** A scalar value. *)
 type secret
@@ -21,7 +21,7 @@ module Dhe : sig
       The generated private key is checked to be greater than zero and lower than the group
       order meaning the public key cannot be the point at inifinity. *)
 
-  val key_exchange : secret -> Cstruct.t -> (Cstruct.t, point_error) result
+  val key_exchange : secret -> Cstruct.t -> (Cstruct.t, error) result
   (** [key_exchange ~private_key received_public_key] performs Diffie-Hellman key exchange
       using your private key and the other party's public key. Returns the shared secret
       or an error if the received public is invalid or is the point at infinity.

@@ -73,8 +73,7 @@ let perform_key_exchange ~public_key ~raw_private_key =
   let open Fiat_p256 in
   to_string_result ~pp_error:pp_secret_error (secret_of_cs raw_private_key)
   >>= fun secret ->
-  to_string_result ~pp_error:pp_point_error
-    (Dhe.key_exchange secret public_key)
+  to_string_result ~pp_error (Dhe.key_exchange secret public_key)
 
 let interpret_test ~tcId {public_key; raw_private_key; expected} () =
   match perform_key_exchange ~public_key ~raw_private_key with
