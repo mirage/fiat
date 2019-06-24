@@ -26,11 +26,11 @@ val scalar_of_cs : Cstruct.t -> (scalar, scalar_error) result
     number is zero, or if it is larger than or equal to the group order. *)
 
 module Dhe : sig
-  val generate_key : rng:(int -> Cstruct.t) -> scalar * Cstruct.t
-  (** [generate_key ~rng] generates a private and a public key for Ephemeral Diffie-Hellman.
+  val gen_key : rng:(int -> Cstruct.t) -> scalar * Cstruct.t
+  (** [gen_key ~rng] generates a private and a public key for Ephemeral Diffie-Hellman.
       The returned key pair MUST only be used for a single key exchange.
       [rng] is the function used to repeteadly generate a private key until a valid candidate
-      is obtained. [rng]'s int parameter is the size of [Cstruct.t] to generate.
+      is obtained. [rng]'s int parameter is the size of the [Cstruct.t] to generate.
       The generated private key is checked to be greater than zero and lower than the group
       order meaning the public key cannot be the point at inifinity. *)
 

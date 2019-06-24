@@ -68,7 +68,7 @@ module Dhe = struct
     | Error _ ->
         generate_private_key ~rng ()
 
-  let generate_key ~rng =
+  let gen_key ~rng =
     let private_key = generate_private_key ~rng () in
     let public_key = public private_key in
     let to_send = point_to_cs public_key in
