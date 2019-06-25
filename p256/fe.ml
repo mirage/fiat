@@ -15,7 +15,7 @@ let r_squared =
 
 let to_montgomery x = mul x x r_squared
 
-let copy dst src = Bigarray.Array1.blit src dst
+let copy dst src = Bigarray_compat.Array1.blit src dst
 
 external from_bytes_buf :
   t -> Cstruct.buffer -> unit
