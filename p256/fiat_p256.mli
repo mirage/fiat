@@ -9,12 +9,12 @@ type error =
 val pp_error : Format.formatter -> error -> unit
 (** Pretty printer for public key parsing errors *)
 
-(** A scalar value. *)
+(** Type for P256 private keys *)
 type secret
 
 val gen_key : rng:(int -> Cstruct.t) -> secret * Cstruct.t
-(** [gen_key ~rng] generates a private and a public key for Ephemeral Diffie-Hellman.
-    The returned key pair MUST only be used for a single key exchange.
+(** [gen_key ~rng] generates a private and a public key for Ephemeral Diffie-Hellman
+    over P256. The returned key pair MUST only be used for a single key exchange.
     [rng] is the function used to repeteadly generate a private key until a valid candidate
     is obtained. [rng]'s int parameter is the size of the [Cstruct.t] to generate.
     The generated private key is checked to be greater than zero and lower than the group
