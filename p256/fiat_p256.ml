@@ -64,6 +64,8 @@ let rec generate_private_key ~rng () =
   match secret_of_cs candidate with
   | Ok secret ->
       secret
+  | Error `Invalid_length ->
+      failwith "Fiat_p256.gen_key: generator returned an invalid length"
   | Error _ ->
       generate_private_key ~rng ()
 
