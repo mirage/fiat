@@ -71,8 +71,8 @@ type test =
 
 let perform_key_exchange ~public_key ~raw_private_key =
   let open Fiat_p256 in
-  to_string_result ~pp_error:pp_secret_error (secret_of_cs raw_private_key)
-  >>= fun secret ->
+  let gen _ = raw_private_key in
+  let secret, _ = gen_key ~rng:gen in
   to_string_result ~pp_error (key_exchange secret public_key)
 
 let interpret_test ~tcId {public_key; raw_private_key; expected} () =

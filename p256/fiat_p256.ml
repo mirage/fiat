@@ -53,10 +53,6 @@ let point_to_cs = Point.to_cstruct
 
 type secret = Scalar.t
 
-type secret_error = Error.scalar_error
-
-let pp_secret_error = Error.pp_scalar_error
-
 let secret_of_cs = Scalar.of_cstruct
 
 let rec generate_private_key ~rng () =
