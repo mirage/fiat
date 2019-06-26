@@ -24,8 +24,11 @@ val gen_key : rng:(int -> Cstruct.t) -> secret * Cstruct.t
     order meaning the public key cannot be the point at inifinity. *)
 
 val key_exchange : secret -> Cstruct.t -> (Cstruct.t, error) result
-(** [key_exchange ~private_key received_public_key] performs Diffie-Hellman key exchange
-    using your private key and the other party's public key. Returns the shared secret
-    or an error if the received public is invalid or is the point at infinity.
+(** [key_exchange secret received_public_key] performs Diffie-Hellman key exchange
+    using your secret and the data received from the other party. Returns the shared secret
+    or an error if the received data is wrongly encoded, doesn't represent a point on the curve
+    or represent the point at infinity.
+
+    The shared secret is returned as is i.e. not stripped from leading 0x00 bytes.
 
     @see <http://www.secg.org/sec1-v2.pdf> for public key encoding format. *)
