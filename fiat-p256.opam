@@ -8,6 +8,10 @@ authors: [
     "Jade Philipoom <jadep@mit.edu> <jade.philipoom@gmail.com>"
     "Massachusetts Institute of Technology"
 ]
+homepage: "https://github.com/mirage/fiat"
+bug-reports: "https://github.com/mirage/fiat/issues"
+dev-repo: "git+https://github.com/mirage/fiat.git"
+doc: "https://mirage.github.io/fiat/doc"
 tags: ["org:mirage"]
 build: [
  ["dune" "subst"] {pinned}
