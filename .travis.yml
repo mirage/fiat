@@ -7,7 +7,7 @@ script: bash ./.travis-docker.sh
 env:
   global:
     - PACKAGE=fiat-p256
-    - DISTRO=alpine-3.7
+    - DISTRO=alpine
   matrix:
     - OCAML_VERSION=4.04
     - OCAML_VERSION=4.05
