@@ -32,11 +32,3 @@ val key_exchange : secret -> Cstruct.t -> (Cstruct.t, error) result
     The shared secret is returned as is i.e. not stripped from leading 0x00 bytes.
 
     @see <http://www.secg.org/sec1-v2.pdf> for public key encoding format. *)
-
-(**/**)
-
-module For_tests : sig
-  module Parameters : sig
-    val p : Hex.t
-  end
-end

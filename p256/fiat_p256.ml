@@ -45,7 +45,3 @@ let key_exchange secret received =
   | Error _ as err -> err
   | Ok other_party_public_key ->
       Ok (dh ~scalar:secret ~point:other_party_public_key)
-
-module For_tests = struct
-  module Parameters = Parameters
-end

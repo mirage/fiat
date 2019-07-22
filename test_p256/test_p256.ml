@@ -119,7 +119,11 @@ let%expect_test "key_exchange" =
   test_validate_point ~x:zero ~y:sb;
   [%expect
     {| 9e5764219829a1571825f984c64d0568985b3aa479dc153081b7912b0433b8dc |}];
-  test_validate_point ~x:Fiat_p256.For_tests.Parameters.p ~y:sb;
+  test_validate_point
+    ~x:
+      (`Hex
+        "FFFFFFFF00000001000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFF")
+    ~y:sb;
   [%expect {| Cannot parse point: invalid range |}];
   let test_scalar_validation h =
     let safe =
