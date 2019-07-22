@@ -38,6 +38,8 @@ val key_exchange : secret -> Cstruct.t -> (Cstruct.t, error) result
 module For_tests : sig
   module Cstruct_util : sig
     val compare_be : Cstruct.t -> Cstruct.t -> int
+
+    val pp_hex_le : Format.formatter -> Cstruct.t -> unit
   end
 
   module Parameters : sig
@@ -84,4 +86,8 @@ module For_tests : sig
   module Montgomery_ladder : sig
     val scalar_mult : Scalar.t -> Point.t -> Point.t
   end
+
+  val public : Scalar.t -> Point.t
+
+  val dh : scalar:Scalar.t -> point:Point.t -> Cstruct.t
 end
