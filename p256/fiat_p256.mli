@@ -76,6 +76,12 @@ module For_tests : sig
 
     val of_hex : Hex.t -> (t, Error.scalar_error) result
 
+    val of_hex_exn : Hex.t -> t
+
     val pp : Format.formatter -> t -> unit
+  end
+
+  module Montgomery_ladder : sig
+    val scalar_mult : Scalar.t -> Point.t -> Point.t
   end
 end
