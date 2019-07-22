@@ -16,43 +16,27 @@ module Cstruct_util = struct
     ()
 end
 
+let key_pair_of_hex h = Fiat_p256.gen_key ~rng:(fun _ -> Hex.to_cstruct h)
+
+let scalar_of_hex h = fst (key_pair_of_hex h)
+
+let pp_hex_le fmt cs =
+  let n = Cstruct.len cs in
+  for i = n - 1 downto 0 do
+    let byte = Cstruct.get_uint8 cs i in
+    Format.fprintf fmt "%02x" byte
+  done
+
+let pp_result ppf = function
+  | Ok cs -> pp_hex_le ppf cs
+  | Error e -> Format.fprintf ppf "%a" Fiat_p256.pp_error e
+
+let is_ok = function
+  | Ok _ -> true
+  | Error _ -> false
+
 module Point = struct
   open Fiat_p256.For_tests.Point
-
-  let%expect_test "validate_finite_point" =
-    let is_ok = function
-      | Ok _ -> true
-      | Error _ -> false
-    in
-    let test ~x ~y =
-      Printf.printf "%b"
-        (is_ok
-           (validate_finite_point ~x:(Hex.to_cstruct x) ~y:(Hex.to_cstruct y)))
-    in
-    test
-      ~x:
-        (`Hex
-          "62d5bd3372af75fe85a040715d0f502428e07046868b0bfdfa61d731afe44f26")
-      ~y:
-        (`Hex
-          "ac333a93a9e70a81cd5a95b5bf8d13990eb741c8c38872b4a07d275a014e30cf");
-    [%expect {| true |}];
-    test
-      ~x:
-        (`Hex
-          "0000000000000000000000000000000000000000000000000000000000000000")
-      ~y:
-        (`Hex
-          "0000000000000000000000000000000000000000000000000000000000000000");
-    [%expect {| false |}];
-    let zero = `Hex (String.make 64 '0') in
-    let sb =
-      `Hex "66485c780e2f83d72433bd5d84a06bb6541c2af31dae871728bf856a174f93f4"
-    in
-    test ~x:zero ~y:sb;
-    [%expect {| true |}];
-    test ~x:Fiat_p256.For_tests.Parameters.p ~y:sb;
-    [%expect {| false |}]
 
   let%expect_test "of_hex" =
     let test hex =
@@ -80,21 +64,6 @@ module Point = struct
     test (`Hex "ff");
     [%expect {| false |}]
 end
-
-let key_pair_of_hex h = Fiat_p256.gen_key ~rng:(fun _ -> Hex.to_cstruct h)
-
-let scalar_of_hex h = fst (key_pair_of_hex h)
-
-let pp_hex_le fmt cs =
-  let n = Cstruct.len cs in
-  for i = n - 1 downto 0 do
-    let byte = Cstruct.get_uint8 cs i in
-    Format.fprintf fmt "%02x" byte
-  done
-
-let pp_result ppf = function
-  | Ok cs -> pp_hex_le ppf cs
-  | Error e -> Format.fprintf ppf "%a" Fiat_p256.pp_error e
 
 let%expect_test "key_exchange" =
   let test d p =
@@ -164,4 +133,39 @@ let%expect_test "key_exchange" =
     (`Hex
       "04000000000000000000000000000000000000000000000000000000000000000066485c780e2f83d72433bd5d84a06bb6541c2af31dae871728bf856a174f93f4");
   [%expect
-    {| 48e82c9b82c88cb9fc2a5cff9e7c41bc4255ff6bd3814538c9b130877c07e4cf |}]
+    {| 48e82c9b82c88cb9fc2a5cff9e7c41bc4255ff6bd3814538c9b130877c07e4cf |}];
+  let test_validate_point ~x ~y =
+    let scalar =
+      scalar_of_hex
+        (`Hex
+          "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f")
+    in
+    let point =
+      Cstruct.concat [Cstruct.of_hex "04"; Hex.to_cstruct x; Hex.to_cstruct y]
+    in
+    Printf.printf "%b" (is_ok (Fiat_p256.key_exchange scalar point))
+  in
+  test_validate_point
+    ~x:
+      (`Hex
+        "62d5bd3372af75fe85a040715d0f502428e07046868b0bfdfa61d731afe44f26")
+    ~y:
+      (`Hex
+        "ac333a93a9e70a81cd5a95b5bf8d13990eb741c8c38872b4a07d275a014e30cf");
+  [%expect {| true |}];
+  test_validate_point
+    ~x:
+      (`Hex
+        "0000000000000000000000000000000000000000000000000000000000000000")
+    ~y:
+      (`Hex
+        "0000000000000000000000000000000000000000000000000000000000000000");
+  [%expect {| false |}];
+  let zero = `Hex (String.make 64 '0') in
+  let sb =
+    `Hex "66485c780e2f83d72433bd5d84a06bb6541c2af31dae871728bf856a174f93f4"
+  in
+  test_validate_point ~x:zero ~y:sb;
+  [%expect {| true |}];
+  test_validate_point ~x:Fiat_p256.For_tests.Parameters.p ~y:sb;
+  [%expect {| false |}]

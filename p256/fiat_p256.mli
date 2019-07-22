@@ -47,9 +47,6 @@ module For_tests : sig
   module Point : sig
     type t
 
-    val validate_finite_point :
-      x:Cstruct.t -> y:Cstruct.t -> (t, error) result
-
     val of_hex : Hex.t -> (t, error) result
   end
 end

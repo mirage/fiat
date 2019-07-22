@@ -44,6 +44,3 @@ val to_cstruct : t -> Cstruct.t
 
 val x_of_finite_point : t -> Cstruct.t
 (** Return only the X coordinate of a point that is not at infinity. *)
-
-val validate_finite_point :
-  x:Cstruct.t -> y:Cstruct.t -> (t, [> `Invalid_range | `Not_on_curve]) result
