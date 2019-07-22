@@ -31,10 +31,6 @@ let pp_result ppf = function
   | Ok cs -> pp_hex_le ppf cs
   | Error e -> Format.fprintf ppf "%a" Fiat_p256.pp_error e
 
-let is_ok = function
-  | Ok _ -> true
-  | Error _ -> false
-
 module Point = struct
   open Fiat_p256.For_tests.Point
 
@@ -143,7 +139,7 @@ let%expect_test "key_exchange" =
     let point =
       Cstruct.concat [Cstruct.of_hex "04"; Hex.to_cstruct x; Hex.to_cstruct y]
     in
-    Printf.printf "%b" (is_ok (Fiat_p256.key_exchange scalar point))
+    Format.printf "%a" pp_result (Fiat_p256.key_exchange scalar point)
   in
   test_validate_point
     ~x:
@@ -152,7 +148,8 @@ let%expect_test "key_exchange" =
     ~y:
       (`Hex
         "ac333a93a9e70a81cd5a95b5bf8d13990eb741c8c38872b4a07d275a014e30cf");
-  [%expect {| true |}];
+  [%expect
+    {| 9ae4ef764518f67e55eb9b85ddf6447f5b122ed5e1c28b3317c031b4a20f7eb2 |}];
   test_validate_point
     ~x:
       (`Hex
@@ -160,12 +157,13 @@ let%expect_test "key_exchange" =
     ~y:
       (`Hex
         "0000000000000000000000000000000000000000000000000000000000000000");
-  [%expect {| false |}];
+  [%expect {| Cannot parse point: point is not on curve |}];
   let zero = `Hex (String.make 64 '0') in
   let sb =
     `Hex "66485c780e2f83d72433bd5d84a06bb6541c2af31dae871728bf856a174f93f4"
   in
   test_validate_point ~x:zero ~y:sb;
-  [%expect {| true |}];
+  [%expect
+    {| 9e5764219829a1571825f984c64d0568985b3aa479dc153081b7912b0433b8dc |}];
   test_validate_point ~x:Fiat_p256.For_tests.Parameters.p ~y:sb;
-  [%expect {| false |}]
+  [%expect {| Cannot parse point: invalid range |}]
