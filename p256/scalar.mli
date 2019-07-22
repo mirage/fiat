@@ -15,3 +15,5 @@ val of_hex_exn : Hex.t -> t
 val bit_at : t -> int -> bool
 (** [bit_at d n] returns the [n]th bit from [d], where bit 0 is the least
     significant bit. *)
+
+val pp : Format.formatter -> t -> unit

@@ -81,4 +81,6 @@ module For_tests = struct
   module Cstruct_util = Cstruct_util
   module Parameters = Parameters
   module Point = Point
+  module Error = Error
+  module Scalar = Scalar
 end
