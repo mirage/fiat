@@ -39,4 +39,27 @@ module For_tests : sig
   module Cstruct_util : sig
     val compare_be : Cstruct.t -> Cstruct.t -> int
   end
+
+  module Parameters : sig
+    val p : Hex.t
+  end
+
+  module Point : sig
+    type t
+
+    val validate_finite_point :
+      x:Cstruct.t -> y:Cstruct.t -> (t, error) result
+
+    val of_hex : Hex.t -> (t, error) result
+
+    val of_hex_exn : Hex.t -> t
+
+    val pp : Format.formatter -> t -> unit
+
+    val double : t -> t
+
+    val add : t -> t -> t
+
+    val at_infinity : unit -> t
+  end
 end

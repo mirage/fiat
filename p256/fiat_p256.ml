@@ -73,13 +73,12 @@ let gen_key ~rng =
 
 let key_exchange secret received =
   match point_of_cs received with
-  | Error _ as err ->
-      err
+  | Error _ as err -> err
   | Ok other_party_public_key ->
       Ok (dh ~scalar:secret ~point:other_party_public_key)
 
 module For_tests = struct
-  module Cstruct_util = struct
-    let compare_be = Cstruct_util.compare_be
-  end
+  module Cstruct_util = Cstruct_util
+  module Parameters = Parameters
+  module Point = Point
 end
