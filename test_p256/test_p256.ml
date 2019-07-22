@@ -31,36 +31,6 @@ let pp_result ppf = function
   | Ok cs -> pp_hex_le ppf cs
   | Error e -> Format.fprintf ppf "%a" Fiat_p256.pp_error e
 
-module Point = struct
-  open Fiat_p256.For_tests.Point
-
-  let%expect_test "of_hex" =
-    let test hex =
-      let ok =
-        match of_hex hex with
-        | Ok _ -> true
-        | Error _ -> false
-      in
-      Printf.printf "%b" ok
-    in
-    test (`Hex "00");
-    [%expect {| true |}];
-    test (`Hex "0001");
-    [%expect {| false |}];
-    test
-      (`Hex
-        "0400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000");
-    [%expect {| false |}];
-    test
-      (`Hex
-        "0462d5bd3372af75fe85a040715d0f502428e07046868b0bfdfa61d731afe44f26ac333a93a9e70a81cd5a95b5bf8d13990eb741c8c38872b4a07d275a014e30cf");
-    [%expect {| true |}];
-    test (`Hex "0400");
-    [%expect {| false |}];
-    test (`Hex "ff");
-    [%expect {| false |}]
-end
-
 let%expect_test "key_exchange" =
   let test d p =
     Format.printf "%a\n" pp_result (Fiat_p256.key_exchange d p)

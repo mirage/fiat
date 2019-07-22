@@ -63,8 +63,6 @@ let of_cstruct cs =
   | _, _ ->
       Error `Invalid_format
 
-let of_hex h = of_cstruct (Hex.to_cstruct h)
-
 let to_affine p =
   if is_infinity p then None
   else
@@ -115,3 +113,10 @@ let x_of_finite_point p =
       assert false
   | Some (x, _) ->
       Cstruct.rev x
+
+let params_g =
+  let x = Hex.to_cstruct Parameters.g_x in
+  let y = Hex.to_cstruct Parameters.g_y in
+  match validate_finite_point ~x ~y with
+  | Ok p -> p
+  | Error _ -> assert false

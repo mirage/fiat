@@ -31,16 +31,11 @@ val of_cstruct :
     @see <http://www.secg.org/sec1-v2.pdf>
 *)
 
-val of_hex :
-     Hex.t
-  -> ( t
-     , [> `Invalid_format | `Invalid_length | `Invalid_range | `Not_on_curve]
-     )
-     result
-(** Convert from hex. See [of_cstruct]. *)
-
 val to_cstruct : t -> Cstruct.t
 (** Convert to a cstruct. See [of_cstruct] for the format. *)
 
 val x_of_finite_point : t -> Cstruct.t
 (** Return only the X coordinate of a point that is not at infinity. *)
+
+val params_g : t
+(** The curve's base point *)

@@ -43,10 +43,4 @@ module For_tests : sig
   module Parameters : sig
     val p : Hex.t
   end
-
-  module Point : sig
-    type t
-
-    val of_hex : Hex.t -> (t, error) result
-  end
 end
