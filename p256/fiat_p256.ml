@@ -77,3 +77,9 @@ let key_exchange secret received =
       err
   | Ok other_party_public_key ->
       Ok (dh ~scalar:secret ~point:other_party_public_key)
+
+module For_tests = struct
+  module Cstruct_util = struct
+    let compare_be = Cstruct_util.compare_be
+  end
+end

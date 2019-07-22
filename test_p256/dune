@@ -1,0 +1,6 @@
+(library
+ (name test_p256)
+ (libraries fiat_p256)
+ (preprocess
+  (pps ppx_expect))
+ (inline_tests))
