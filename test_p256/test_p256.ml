@@ -85,8 +85,15 @@ let key_pair_of_hex h = Fiat_p256.gen_key ~rng:(fun _ -> Hex.to_cstruct h)
 
 let scalar_of_hex h = fst (key_pair_of_hex h)
 
+let pp_hex_le fmt cs =
+  let n = Cstruct.len cs in
+  for i = n - 1 downto 0 do
+    let byte = Cstruct.get_uint8 cs i in
+    Format.fprintf fmt "%02x" byte
+  done
+
 let pp_result ppf = function
-  | Ok cs -> Fiat_p256.For_tests.Cstruct_util.pp_hex_le ppf cs
+  | Ok cs -> pp_hex_le ppf cs
   | Error e -> Format.fprintf ppf "%a" Fiat_p256.pp_error e
 
 let%expect_test "key_exchange" =

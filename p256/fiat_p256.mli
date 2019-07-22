@@ -38,8 +38,6 @@ val key_exchange : secret -> Cstruct.t -> (Cstruct.t, error) result
 module For_tests : sig
   module Cstruct_util : sig
     val compare_be : Cstruct.t -> Cstruct.t -> int
-
-    val pp_hex_le : Format.formatter -> Cstruct.t -> unit
   end
 
   module Parameters : sig
