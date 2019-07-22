@@ -1,7 +1,10 @@
 let dh ~scalar ~point =
   Point.x_of_finite_point (Montgomery_ladder.scalar_mult scalar point)
 
-let base_point = Point.of_hex_exn Parameters.g
+let base_point =
+  match Point.of_hex Parameters.g with
+  | Ok x -> x
+  | Error _ -> assert false
 
 let public scalar = Montgomery_ladder.scalar_mult scalar base_point
 

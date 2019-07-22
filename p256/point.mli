@@ -39,14 +39,8 @@ val of_hex :
      result
 (** Convert from hex. See [of_cstruct]. *)
 
-val of_hex_exn : Hex.t -> t
-(** Convert from hex, raising an exception if data is invalid. See [of_hex]. *)
-
 val to_cstruct : t -> Cstruct.t
 (** Convert to a cstruct. See [of_cstruct] for the format. *)
-
-val pp : Format.formatter -> t -> unit
-(** Display a point in the format documented in [of_cstruct]. *)
 
 val x_of_finite_point : t -> Cstruct.t
 (** Return only the X coordinate of a point that is not at infinity. *)

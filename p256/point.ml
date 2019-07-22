@@ -65,13 +65,6 @@ let of_cstruct cs =
 
 let of_hex h = of_cstruct (Hex.to_cstruct h)
 
-let of_hex_exn h =
-  match of_hex h with
-  | Ok p ->
-      p
-  | Error e ->
-      failwith (Format.asprintf "of_hex_exn: %a" Error.pp_point_error e)
-
 let to_affine p =
   if is_infinity p then None
   else
@@ -103,8 +96,6 @@ let to_cstruct p =
       Cstruct.set_uint8 four 0 4;
       let rev_x = Cstruct.rev x and rev_y = Cstruct.rev y in
       Cstruct.concat [four; rev_x; rev_y]
-
-let pp fmt p = Cstruct_util.pp_hex_le fmt (Cstruct.rev (to_cstruct p))
 
 external double_c : t -> t -> unit = "fiat_p256_caml_point_double" [@@noalloc]
 

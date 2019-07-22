@@ -53,15 +53,5 @@ module For_tests : sig
       x:Cstruct.t -> y:Cstruct.t -> (t, error) result
 
     val of_hex : Hex.t -> (t, error) result
-
-    val of_hex_exn : Hex.t -> t
-
-    val pp : Format.formatter -> t -> unit
-
-    val double : t -> t
-
-    val add : t -> t -> t
-
-    val at_infinity : unit -> t
   end
 end
