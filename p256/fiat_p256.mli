@@ -44,8 +44,6 @@ module For_tests : sig
 
   module Parameters : sig
     val p : Hex.t
-
-    val n : Hex.t
   end
 
   module Point : sig
@@ -65,19 +63,5 @@ module For_tests : sig
     val add : t -> t -> t
 
     val at_infinity : unit -> t
-  end
-
-  module Error : sig
-    type scalar_error
-
-    val pp_scalar_error : Format.formatter -> scalar_error -> unit
-  end
-
-  module Scalar : sig
-    type t
-
-    val of_hex : Hex.t -> (t, Error.scalar_error) result
-
-    val pp : Format.formatter -> t -> unit
   end
 end

@@ -168,51 +168,6 @@ module Point = struct
       {| 04e2534a3532d08fbba02dde659ee62bd0031fe2db785596ef509302446b030852e0f1575a4c633cc719dfee5fda862d764efc96c3f30ee0055c42c23f184ed8c6 |}]
 end
 
-module Scalar = struct
-  open Fiat_p256.For_tests.Scalar
-
-  let pp_err pp fmt = function
-    | Error e -> Fiat_p256.For_tests.Error.pp_scalar_error fmt e
-    | Ok x -> pp fmt x
-
-  let%expect_test "of_hex" =
-    let test h =
-      let s = of_hex h in
-      Format.printf "%a\n" (pp_err pp) s
-    in
-    test
-      (`Hex
-        "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f");
-    [%expect
-      {| 000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f |}];
-    test
-      (`Hex
-        "0000000000000000000000000000000000000000000000000000000000000003");
-    [%expect
-      {| 0000000000000000000000000000000000000000000000000000000000000003 |}];
-    test
-      (`Hex
-        "2000000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f");
-    [%expect {| Cannot parse scalar: invalid length |}];
-    test
-      (`Hex
-        "0000000000000000000000000000000000000000000000000000000000000000");
-    [%expect {| Cannot parse scalar: invalid range |}];
-    test
-      (`Hex
-        (* n-1 *)
-        "FFFFFFFF00000000FFFFFFFFFFFFFFFFBCE6FAADA7179E84F3B9CAC2FC632550");
-    [%expect
-      {| ffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632550 |}];
-    test Fiat_p256.For_tests.Parameters.n;
-    [%expect {| Cannot parse scalar: invalid range |}];
-    test
-      (`Hex
-        (* n+1 *)
-        "FFFFFFFF00000000FFFFFFFFFFFFFFFFBCE6FAADA7179E84F3B9CAC2FC632552");
-    [%expect {| Cannot parse scalar: invalid range |}]
-end
-
 let key_pair_of_hex h = Fiat_p256.gen_key ~rng:(fun _ -> Hex.to_cstruct h)
 
 let scalar_of_hex h = fst (key_pair_of_hex h)
