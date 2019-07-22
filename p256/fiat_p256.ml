@@ -54,5 +54,4 @@ module For_tests = struct
   module Point = Point
   module Error = Error
   module Scalar = Scalar
-  module Montgomery_ladder = Montgomery_ladder
 end
