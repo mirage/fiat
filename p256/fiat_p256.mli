@@ -86,8 +86,4 @@ module For_tests : sig
   module Montgomery_ladder : sig
     val scalar_mult : Scalar.t -> Point.t -> Point.t
   end
-
-  val public : Scalar.t -> Point.t
-
-  val dh : scalar:Scalar.t -> point:Point.t -> Cstruct.t
 end

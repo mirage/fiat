@@ -280,22 +280,24 @@ end
 module Dh = struct
   open Fiat_p256.For_tests
 
-  let%expect_test "dh" =
+  let pp_result ppf = function
+    | Ok cs -> Cstruct_util.pp_hex_le ppf cs
+    | Error e -> Format.fprintf ppf "%a" Fiat_p256.pp_error e
+
+  let from h _ = Hex.to_cstruct h
+
+  let%expect_test "key_exchange" =
     let test d p =
-      Format.printf "%a\n" Cstruct_util.pp_hex_le (dh ~scalar:d ~point:p)
+      Format.printf "%a\n" pp_result (Fiat_p256.key_exchange d p)
     in
-    let d_a =
-      Scalar.of_hex_exn
-        (`Hex
-          "200102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f")
+    let pub_a =
+      `Hex "200102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f"
     in
-    let d_b =
-      Scalar.of_hex_exn
-        (`Hex
-          "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f")
+    let pub_b =
+      `Hex "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f"
     in
-    let p_a = public d_a in
-    let p_b = public d_b in
+    let d_a, p_a = Fiat_p256.gen_key ~rng:(from pub_a) in
+    let d_b, p_b = Fiat_p256.gen_key ~rng:(from pub_b) in
     test d_b p_a;
     [%expect
       {| 2e3e4065a62a7f425aaf8aae3d158f367c733300b5002e0b62f4bc6260789e1b |}];

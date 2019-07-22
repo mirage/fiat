@@ -55,6 +55,4 @@ module For_tests = struct
   module Error = Error
   module Scalar = Scalar
   module Montgomery_ladder = Montgomery_ladder
-  let public = public
-  let dh = dh
 end
