@@ -36,10 +36,6 @@ val key_exchange : secret -> Cstruct.t -> (Cstruct.t, error) result
 (**/**)
 
 module For_tests : sig
-  module Cstruct_util : sig
-    val compare_be : Cstruct.t -> Cstruct.t -> int
-  end
-
   module Parameters : sig
     val p : Hex.t
   end

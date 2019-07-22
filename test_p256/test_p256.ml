@@ -1,21 +1,5 @@
 let linkme = ()
 
-module Cstruct_util = struct
-  open Fiat_p256.For_tests.Cstruct_util
-
-  let%expect_test "compare_be" =
-    let test a b = print_int (compare_be a b) in
-    test (Cstruct.of_string "aa") (Cstruct.of_string "ab");
-    [%expect {| -1 |}];
-    test (Cstruct.of_string "ab") (Cstruct.of_string "aa");
-    [%expect {| 1 |}];
-    test (Cstruct.of_string "aa") (Cstruct.of_string "aa");
-    [%expect {| 0 |}];
-    test (Cstruct.of_string "abx") (Cstruct.of_string "aaz");
-    [%expect {| 1 |}];
-    ()
-end
-
 let key_pair_of_hex h = Fiat_p256.gen_key ~rng:(fun _ -> Hex.to_cstruct h)
 
 let scalar_of_hex h = fst (key_pair_of_hex h)
@@ -136,4 +120,34 @@ let%expect_test "key_exchange" =
   [%expect
     {| 9e5764219829a1571825f984c64d0568985b3aa479dc153081b7912b0433b8dc |}];
   test_validate_point ~x:Fiat_p256.For_tests.Parameters.p ~y:sb;
-  [%expect {| Cannot parse point: invalid range |}]
+  [%expect {| Cannot parse point: invalid range |}];
+  let test_scalar_validation h =
+    let safe =
+      Cstruct.of_hex
+        "0000000000000000000000000000000000000000000000000000000000000001"
+    in
+    let ncalls = ref 0 in
+    let return_value = ref (Some (Hex.to_cstruct h)) in
+    let rng _ =
+      incr ncalls;
+      match !return_value with
+      | None -> safe
+      | Some rv ->
+          return_value := None;
+          rv
+    in
+    let _, _ = Fiat_p256.gen_key ~rng in
+    Printf.printf "%d\n" !ncalls
+  in
+  test_scalar_validation
+    (`Hex "0000000000000000000000000000000000000000000000000000000000000000");
+  [%expect {| 2 |}];
+  test_scalar_validation
+    (`Hex "0000000000000000000000000000000000000000000000000000000000000001");
+  [%expect {| 1 |}];
+  test_scalar_validation
+    (`Hex "FFFFFFFF00000000FFFFFFFFFFFFFFFFBCE6FAADA7179E84F3B9CAC2FC632550");
+  [%expect {| 1 |}];
+  test_scalar_validation
+    (`Hex "FFFFFFFF00000000FFFFFFFFFFFFFFFFBCE6FAADA7179E84F3B9CAC2FC632551");
+  [%expect {| 2 |}]

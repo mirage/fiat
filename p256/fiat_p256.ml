@@ -47,6 +47,5 @@ let key_exchange secret received =
       Ok (dh ~scalar:secret ~point:other_party_public_key)
 
 module For_tests = struct
-  module Cstruct_util = Cstruct_util
   module Parameters = Parameters
 end
