@@ -38,4 +38,6 @@ let whole_key_exchange =
   in
   [(test_name, `Quick, test_fun)]
 
-let () = Alcotest.run "Fiat_p256" [("Functional", whole_key_exchange)]
+let () =
+  Random.self_init ();
+  Alcotest.run "Fiat_p256" [("Functional", whole_key_exchange)]
