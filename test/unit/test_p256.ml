@@ -1,17 +1,7 @@
 module Testable = struct
-  let ok_or_error =
-    let pp ppf = function
-      | Ok () -> Format.fprintf ppf "ok"
-      | Error e -> Format.fprintf ppf "%a" Fiat_p256.pp_error e
-    in
-    let eq ra rb =
-      match (ra, rb) with
-      | Ok (), Ok () -> true
-      | Error (ea : Fiat_p256.error), Error eb -> ea = eb
-      | Ok _, Error _ -> false
-      | Error _, Ok _ -> false
-    in
-    Alcotest.testable pp eq
+  let fiat_error = Alcotest.testable Fiat_p256.pp_error ( = )
+
+  let ok_or_error = Alcotest.result Alcotest.unit fiat_error
 end
 
 let key_pair_of_hex h = Fiat_p256.gen_key ~rng:(fun _ -> Hex.to_cstruct h)
