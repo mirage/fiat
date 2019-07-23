@@ -28,8 +28,11 @@ let is_solution_to_curve_equation ~x ~y =
 
 let check_coordinate cs =
   let p = Hex.to_cstruct Parameters.p in
-  if Cstruct_util.compare_be cs p >= 0 then None
-  else Some (Fe.from_be_cstruct cs)
+  (* ensure cs < p: *)
+  match Eqaf_cstruct.compare_be_with_len ~len:32 cs p >= 0 with
+  | true -> None
+  | exception Invalid_argument _ -> None
+  | false -> Some (Fe.from_be_cstruct cs)
 
 (** Convert cstruct coordinates to a finite point ensuring:
     - x < p
