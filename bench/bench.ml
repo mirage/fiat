@@ -1,24 +1,16 @@
 let crypto_random_bytes n =
   let ic = Pervasives.open_in_bin "/dev/urandom" in
   let s = Pervasives.really_input_string ic n in
-  close_in ic; s
+  close_in ic; Cstruct.of_string s
 
-let of_some = function
-  | None ->
-      assert false
-  | Some x ->
-      x
-
-let random_private_key () =
-  crypto_random_bytes 32
-  |> Hex.of_string
-  |> Fiat_p256.scalar_of_hex
-  |> of_some
+let generate_key_pair () = Fiat_p256.gen_key ~rng:crypto_random_bytes
 
 let bench_dh () =
-  let scalar = random_private_key () in
-  let point = Fiat_p256.public @@ random_private_key () in
-  let run () : Cstruct.t = Fiat_p256.dh ~scalar ~point in
+  let scalar, _ = generate_key_pair () in
+  let _, point = generate_key_pair () in
+  let run () : (Cstruct.t, Fiat_p256.error) result =
+    Fiat_p256.key_exchange scalar point
+  in
   Benchmark.throughputN 1 [("P-256", run, ())]
 
 let () =
