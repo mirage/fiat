@@ -4,8 +4,6 @@
  (libraries bigarray-compat cstruct hex)
  (c_names p256_stubs)
  (c_flags (:include discover/cflags.sexp))
- (preprocess (pps ppx_expect))
- (inline_tests)
 )
 
 (rule
