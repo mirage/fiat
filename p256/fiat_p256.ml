@@ -56,7 +56,7 @@ type secret = Scalar.t
 let secret_of_cs = Scalar.of_cstruct
 
 let rec generate_private_key ~rng () =
-  let candidate = rng 4 in
+  let candidate = rng 32 in
   match secret_of_cs candidate with
   | Ok secret ->
       secret
