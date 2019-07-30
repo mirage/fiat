@@ -1,3 +1,5 @@
+(** See {!page-implementation} for a description on how this is implemented. *)
+
 type error =
   [ `Invalid_range
   | `Invalid_format

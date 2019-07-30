@@ -27,3 +27,5 @@
  (name check_vendors)
  (action
   (diff p256_64.h upstream_p256_64)))
+
+(documentation)
