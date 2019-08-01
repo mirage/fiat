@@ -1,13 +1,10 @@
-type t =
-  { f_x : Fe.t
-  ; f_y : Fe.t
-  ; f_z : Fe.t }
+type t = { f_x : Fe.t; f_y : Fe.t; f_z : Fe.t }
 
 let at_infinity () =
   let f_x = Fe.one () in
   let f_y = Fe.one () in
   let f_z = Fe.create () in
-  {f_x; f_y; f_z}
+  { f_x; f_y; f_z }
 
 let is_infinity p = not (Fe.nz p.f_z)
 
@@ -42,7 +39,7 @@ let validate_finite_point ~x ~y =
   | Some f_x, Some f_y ->
       if is_solution_to_curve_equation ~x:f_x ~y:f_y then
         let f_z = Fe.one () in
-        Ok {f_x; f_y; f_z}
+        Ok { f_x; f_y; f_z }
       else Error `Not_on_curve
   | _ -> Error `Invalid_range
 
@@ -51,17 +48,13 @@ let first_byte cs =
 
 let of_cstruct cs =
   match (first_byte cs, Cstruct.len cs) with
-  | Some 0x00, 1 ->
-      Ok (at_infinity ())
+  | Some 0x00, 1 -> Ok (at_infinity ())
   | Some 0x04, 65 ->
       let x = Cstruct.sub cs 1 32 in
       let y = Cstruct.sub cs 33 32 in
       validate_finite_point ~x ~y
-  | Some 0x00, _
-   |Some 0x04, _ ->
-      Error `Invalid_length
-  | _, _ ->
-      Error `Invalid_format
+  | Some 0x00, _ | Some 0x04, _ -> Error `Invalid_length
+  | _, _ -> Error `Invalid_format
 
 let to_affine p =
   if is_infinity p then None
@@ -87,36 +80,31 @@ let to_affine p =
 
 let to_cstruct p =
   match to_affine p with
-  | None ->
-      Cstruct.create 1
+  | None -> Cstruct.create 1
   | Some (x, y) ->
       let four = Cstruct.create 1 in
       Cstruct.set_uint8 four 0 4;
       let rev_x = Cstruct.rev x and rev_y = Cstruct.rev y in
-      Cstruct.concat [four; rev_x; rev_y]
+      Cstruct.concat [ four; rev_x; rev_y ]
 
 external double_c : t -> t -> unit = "fiat_p256_caml_point_double" [@@noalloc]
 
 let double p =
-  let out = {f_x = Fe.create (); f_y = Fe.create (); f_z = Fe.create ()} in
-  double_c out p; out
+  let out = { f_x = Fe.create (); f_y = Fe.create (); f_z = Fe.create () } in
+  double_c out p;
+  out
 
 external add_c : t -> t -> t -> unit = "fiat_p256_caml_point_add" [@@noalloc]
 
 let add fe_p fe_q =
-  let out = {f_x = Fe.create (); f_y = Fe.create (); f_z = Fe.create ()} in
-  add_c out fe_p fe_q; out
+  let out = { f_x = Fe.create (); f_y = Fe.create (); f_z = Fe.create () } in
+  add_c out fe_p fe_q;
+  out
 
 let x_of_finite_point p =
-  match to_affine p with
-  | None ->
-      assert false
-  | Some (x, _) ->
-      Cstruct.rev x
+  match to_affine p with None -> assert false | Some (x, _) -> Cstruct.rev x
 
 let params_g =
   let x = Hex.to_cstruct Parameters.g_x in
   let y = Hex.to_cstruct Parameters.g_y in
-  match validate_finite_point ~x ~y with
-  | Ok p -> p
-  | Error _ -> assert false
+  match validate_finite_point ~x ~y with Ok p -> p | Error _ -> assert false

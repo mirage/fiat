@@ -5,9 +5,7 @@ type point_error =
   | `Not_on_curve
   | `At_infinity ]
 
-type scalar_error =
-  [ `Invalid_length
-  | `Invalid_range ]
+type scalar_error = [ `Invalid_length | `Invalid_range ]
 
 val pp_point_error : Format.formatter -> point_error -> unit
 

@@ -1,12 +1,12 @@
 (** Field elements *)
 
+type t
 (** A field element. This corresponds to a mutable chunk of memory.
     Most operations are done in Montgomery form. This means that the internal
     value is multiplied by a constant [R = 2**256].
 
     @see <https://en.wikipedia.org/wiki/Montgomery_modular_multiplication>
 *)
-type t
 
 val create : unit -> t
 (** Allocate a new element, corresponding to zero. *)

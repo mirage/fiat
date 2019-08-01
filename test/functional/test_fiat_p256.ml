@@ -5,18 +5,13 @@ module Testable = struct
 end
 
 let list_init l f =
-  let rec go acc i =
-    if i = l then
-      List.rev acc
-    else
-      go ((f i)::acc) (i + 1)
-  in
+  let rec go acc i = if i = l then List.rev acc else go (f i :: acc) (i + 1) in
   go [] 0
 
 let int32_to_hex i = Printf.sprintf "%08Lx" i
 
 let prng len =
-  let i32_count = len / 4 + 1 in
+  let i32_count = (len / 4) + 1 in
   let i32s = list_init i32_count (fun _ -> Random.int64 0x100000000L) in
   let as_hex = String.concat "" (List.map int32_to_hex i32s) in
   Cstruct.of_hex (String.sub as_hex 0 (len * 2))
@@ -34,10 +29,11 @@ let whole_key_exchange =
     in
     match res with
     | Ok (s1, s2) -> Alcotest.check Testable.cstruct test_name s1 s2
-    | Error e -> Alcotest.failf "Key exchange failed with error %a" Fiat_p256.pp_error e
+    | Error e ->
+        Alcotest.failf "Key exchange failed with error %a" Fiat_p256.pp_error e
   in
-  [(test_name, `Quick, test_fun)]
+  [ (test_name, `Quick, test_fun) ]
 
 let () =
   Random.self_init ();
-  Alcotest.run "Fiat_p256" [("Functional", whole_key_exchange)]
+  Alcotest.run "Fiat_p256" [ ("Functional", whole_key_exchange) ]

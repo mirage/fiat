@@ -1,16 +1,16 @@
-(** The type for public key parsing errors. *)
 type error =
   [ `Invalid_range
   | `Invalid_format
   | `Invalid_length
   | `Not_on_curve
   | `At_infinity ]
+(** The type for public key parsing errors. *)
 
 val pp_error : Format.formatter -> error -> unit
 (** Pretty printer for public key parsing errors *)
 
-(** Type for P256 private keys *)
 type secret
+(** Type for P256 private keys *)
 
 val gen_key : rng:(int -> Cstruct.t) -> secret * Cstruct.t
 (** [gen_key ~rng] generates a private and a public key for Ephemeral Diffie-Hellman

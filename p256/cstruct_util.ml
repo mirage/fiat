@@ -6,14 +6,6 @@ let compare_be a b =
   for i = a_len - 1 downto 0 do
     let a_i = Cstruct.get_uint8 a i in
     let b_i = Cstruct.get_uint8 b i in
-    match Pervasives.compare a_i b_i with
-    | 0 ->
-        ()
-    | d ->
-        first_diff := Some d
+    match Pervasives.compare a_i b_i with 0 -> () | d -> first_diff := Some d
   done;
-  match !first_diff with
-  | None ->
-      0
-  | Some d ->
-      d
+  match !first_diff with None -> 0 | Some d -> d
