@@ -1,5 +1,5 @@
-(** A Point on the P-256 curve. *)
 type t
+(** A Point on the P-256 curve. *)
 
 val at_infinity : unit -> t
 (** The point at infinity *)
@@ -14,11 +14,10 @@ val double : t -> t
 (** Point doubling. [double p] returns the result of doubling [p]. *)
 
 val of_cstruct :
-     Cstruct.t
-  -> ( t
-     , [> `Invalid_format | `Invalid_length | `Invalid_range | `Not_on_curve]
-     )
-     result
+  Cstruct.t ->
+  ( t,
+    [> `Invalid_format | `Invalid_length | `Invalid_range | `Not_on_curve ] )
+  result
 (** Convert from cstruct. The format is the uncompressed format described in
     SEC1, section 2.3.4, that is to say:
 

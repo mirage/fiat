@@ -1,5 +1,5 @@
-(** A scalar value strictly between 1 and n-1 where n is the group order. *)
 type t
+(** A scalar value strictly between 1 and n-1 where n is the group order. *)
 
 val of_cstruct : Cstruct.t -> (t, Error.scalar_error) result
 (** Read data from a cstruct.
