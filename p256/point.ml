@@ -1,3 +1,5 @@
+module Fe = Field_element
+
 type t = { f_x : Fe.t; f_y : Fe.t; f_z : Fe.t }
 
 let at_infinity () =
