@@ -385,3 +385,15 @@ CAMLprim value fiat_p256_caml_point_add(value out, value p, value q)
 	);
 	CAMLreturn(Val_unit);
 }
+
+CAMLprim value fiat_p256_caml_select(value out, value bit, value t, value f)
+{
+	CAMLparam4(out, bit, t, f);
+	fe_cmovznz(
+		Caml_ba_data_val(out),
+		Bool_val(bit),
+		Caml_ba_data_val(f),
+		Caml_ba_data_val(t)
+	);
+	CAMLreturn(Val_unit);
+}

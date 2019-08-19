@@ -56,3 +56,10 @@ let from_be_cstruct cs =
   from_bytes fe cs_rev;
   to_montgomery fe;
   fe
+
+external select_c : t -> bool -> t -> t -> unit = "fiat_p256_caml_select"
+
+let select bit ~then_ ~else_ =
+  let out = create () in
+  select_c out bit then_ else_;
+  out

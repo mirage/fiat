@@ -56,3 +56,8 @@ val inv : t -> t -> unit
 
 val from_be_cstruct : Cstruct.t -> t
 (** Converts from a big-endian cstruct to Montgomery form. *)
+
+val select : bool -> then_:t -> else_:t -> t
+(** Constant-time selection.
+    [select true ~then_ ~false_] returns a copy of [then_], and
+    [select false ~then_ ~false_] returns a copy of [else_]. *)
