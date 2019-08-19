@@ -1,7 +1,7 @@
 let dh ~scalar ~point =
-  Point.x_of_finite_point (Montgomery_ladder.scalar_mult scalar point)
+  Point.x_of_finite_point (Scalar_mult.scalar_mult scalar point)
 
-let public scalar = Montgomery_ladder.scalar_mult scalar Point.params_g
+let public scalar = Scalar_mult.scalar_mult scalar Point.params_g
 
 type error = Error.point_error
 
