@@ -38,3 +38,6 @@ val x_of_finite_point : t -> Cstruct.t
 
 val params_g : t
 (** The curve's base point *)
+
+val select : bool -> then_:t -> else_:t -> t
+(** Constant-time selection. See [Field_element.select]. *)

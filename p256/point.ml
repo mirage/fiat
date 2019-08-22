@@ -110,3 +110,10 @@ let params_g =
   let x = Hex.to_cstruct Parameters.g_x in
   let y = Hex.to_cstruct Parameters.g_y in
   match validate_finite_point ~x ~y with Ok p -> p | Error _ -> assert false
+
+let select bit ~then_ ~else_ =
+  {
+    f_x = Fe.select bit ~then_:then_.f_x ~else_:else_.f_x;
+    f_y = Fe.select bit ~then_:then_.f_y ~else_:else_.f_y;
+    f_z = Fe.select bit ~then_:then_.f_z ~else_:else_.f_z;
+  }
