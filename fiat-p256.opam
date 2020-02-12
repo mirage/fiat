@@ -30,6 +30,7 @@ depends: [
   "hex"
   "ppx_deriving_yojson" {with-test}
   "rresult" {with-test}
+  "stdlib-shims" {with-test}
   "yojson" {with-test & >= "1.6.0"}
 ]
 synopsis: "Primitives for Elliptic Curve Cryptography taken from Fiat"
