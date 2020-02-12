@@ -1,6 +1,6 @@
 (executable
  (name bench)
- (libraries fiat_p256 benchmark))
+ (libraries fiat_p256 benchmark stdlib-shims))
 
 (alias
  (name bench)
