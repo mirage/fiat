@@ -12,7 +12,15 @@ val pp_error : Format.formatter -> error -> unit
 (** Pretty printer for public key parsing errors *)
 
 type secret
-(** Type for P256 private keys *)
+(** Type for P256 private keys.
+
+    In the usual setting, the private key only be generated and used for key
+    exchange. But it can be useful to create values of type [secret] with a
+    known value, for example to check against test vectors.
+    One can use the following pattern to do this:
+
+    {[ let (secret, _) = gen_key ~rng:(fun _ -> known_data) ]}
+*)
 
 val gen_key : rng:(int -> Cstruct.t) -> secret * Cstruct.t
 (** [gen_key ~rng] generates a private and a public key for Ephemeral Diffie-Hellman
