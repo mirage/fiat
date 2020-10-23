@@ -1,5 +1,4 @@
-(lang dune 1.10)
-(using fmt 1.1)
+(lang dune 2.7)
 (generate_opam_files true)
 (name fiat-p256)
 (source (github mirage/fiat))
@@ -20,17 +19,17 @@
   (benchmark :with-test)
   bigarray-compat
   (cstruct (>= "3.5.0"))
-  (dune (>= "1.10.0"))
   dune-configurator
   (eqaf (>= "0.5"))
   hex
+  (conf-pkg-config :build)
   (ppx_deriving_yojson :with-test)
   (rresult :with-test)
   (stdlib-shims :with-test)
   (yojson (and :with-test (>= "1.6.0"))))
- (depopts mirage-xen-posix ocaml-freestanding)
+ (depopts ocaml-freestanding)
  (conflicts
-  (mirage-xen-posix (< 3.1.0))
+  (mirage-xen (< 6.0.0))
   (ocaml-freestanding (< 0.4.1)))
  (synopsis "Primitives for Elliptic Curve Cryptography taken from Fiat")
  (description

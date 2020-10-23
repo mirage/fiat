@@ -2,8 +2,8 @@
  (name bench)
  (libraries fiat_p256 benchmark stdlib-shims))
 
-(alias
- (name bench)
+(rule
+ (alias bench)
  (action
   (run ./bench.exe --all)))
 
