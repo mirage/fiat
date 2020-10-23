@@ -36,7 +36,8 @@ let key_exchange =
     key_pair_of_hex
       (`Hex "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f")
   in
-  [ test ~name:"b*A" d_b p_a
+  [
+    test ~name:"b*A" d_b p_a
       ~expected:
         "2e3e4065a62a7f425aaf8aae3d158f367c733300b5002e0b62f4bc6260789e1b";
     test ~name:"a*B" d_a p_b
@@ -47,7 +48,7 @@ let key_exchange =
         "2ea4e810837da217a5bfd05f01d12459eeda830b6e0dec7f8afa425c5b55c507";
     test ~name:"b*B" d_b p_b
       ~expected:
-        "a7666bcc3818472194460f7df22d80a5886da0e1679eac930175ce1ff733c7ca"
+        "a7666bcc3818472194460f7df22d80a5886da0e1679eac930175ce1ff733c7ca";
   ]
 
 let scalar_mult =
@@ -65,7 +66,8 @@ let scalar_mult =
     `Hex
       "046B17D1F2E12C4247F8BCE6E563A440F277037D812DEB33A0F4A13945D898C2964FE342E2FE1A7F9B8EE7EB4A7C0F9E162BCE33576B315ECECBB6406837BF51F5"
   in
-  [ test ~n:0
+  [
+    test ~n:0
       ~scalar:
         (`Hex
           "0000000000000000000000000000000000000000000000000000000000000001")
@@ -112,7 +114,7 @@ let scalar_mult =
         (`Hex
           "04000000000000000000000000000000000000000000000000000000000000000066485c780e2f83d72433bd5d84a06bb6541c2af31dae871728bf856a174f93f4")
       ~expected:
-        "48e82c9b82c88cb9fc2a5cff9e7c41bc4255ff6bd3814538c9b130877c07e4cf"
+        "48e82c9b82c88cb9fc2a5cff9e7c41bc4255ff6bd3814538c9b130877c07e4cf";
   ]
 
 let to_ok_or_error = function Ok _ -> Ok () | Error _ as e -> e
@@ -138,7 +140,8 @@ let point_validation =
   let sb =
     `Hex "66485c780e2f83d72433bd5d84a06bb6541c2af31dae871728bf856a174f93f4"
   in
-  [ test ~name:"Ok"
+  [
+    test ~name:"Ok"
       ~x:
         (`Hex
           "62d5bd3372af75fe85a040715d0f502428e07046868b0bfdfa61d731afe44f26")
@@ -160,7 +163,7 @@ let point_validation =
         (`Hex
           "FFFFFFFF00000001000000000000000000000000FFFFFFFFFFFFFFFFFFFFFFFF")
       ~y:sb
-      ~expected:(Error `Invalid_range)
+      ~expected:(Error `Invalid_range);
   ]
 
 let scalar_validation =
@@ -186,7 +189,8 @@ let scalar_validation =
         let got = !ncalls in
         Alcotest.check Alcotest.int __LOC__ expected got )
   in
-  [ test_scalar_validation ~name:"0"
+  [
+    test_scalar_validation ~name:"0"
       ~scalar:
         (`Hex
           "0000000000000000000000000000000000000000000000000000000000000000")
@@ -205,13 +209,14 @@ let scalar_validation =
       ~scalar:
         (`Hex
           "FFFFFFFF00000000FFFFFFFFFFFFFFFFBCE6FAADA7179E84F3B9CAC2FC632551")
-      ~expected:2
+      ~expected:2;
   ]
 
 let () =
   Alcotest.run "Fiat_p256"
-    [ ("Key exchange", key_exchange);
+    [
+      ("Key exchange", key_exchange);
       ("Low level scalar mult", scalar_mult);
       ("Point validation", point_validation);
-      ("Scalar validation when generating", scalar_validation)
+      ("Scalar validation when generating", scalar_validation);
     ]

@@ -5,7 +5,9 @@
  (foreign_stubs
   (language c)
   (names p256_stubs)
-  (flags (:standard) (:include discover/cflags.sexp))))
+  (flags
+   (:standard)
+   (:include discover/cflags.sexp))))
 
 (rule
  (targets upstream_p256_32)
