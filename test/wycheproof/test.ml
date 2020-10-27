@@ -14,15 +14,12 @@ let parse_asn1 s =
       if Cstruct.len rest <> 0 then Error "ASN1 leftover"
       else if not (Asn.OID.equal oid1 ec_public_key) then
         Error "ASN1: wrong oid 1"
-      else if not (Asn.OID.equal oid2 prime256v1) then
-        Error "ASN1: wrong oid 2"
+      else if not (Asn.OID.equal oid2 prime256v1) then Error "ASN1: wrong oid 2"
       else Ok (Cstruct.to_string data)
 
 let ( >>= ) xr f = match xr with Error _ as e -> e | Ok x -> f x
 
-let parse_point p =
-  parse_asn1 p >>= fun h ->
-  Ok Hex.(to_cstruct (of_string h))
+let parse_point p = parse_asn1 p >>= fun h -> Ok Hex.(to_cstruct (of_string h))
 
 let to_string_result ~pp_error = function
   | Ok _ as ok -> ok
@@ -51,8 +48,7 @@ let pad ~total_len cs =
 
 let parse_secret s =
   let stripped = strip_leading_zeroes (Cstruct.of_string s) in
-  pad ~total_len:32 (Cstruct.rev stripped) >>= fun cs ->
-  Ok (Cstruct.rev cs)
+  pad ~total_len:32 (Cstruct.rev stripped) >>= fun cs -> Ok (Cstruct.rev cs)
 
 type test = {
   public_key : Cstruct.t;
