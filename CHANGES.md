@@ -1,3 +1,9 @@
+## v0.2.2 (2020-10-27)
+
+- revise MirageOS cross-compilation runes: use a Makefile, only support
+  ocaml-freestanding (since mirage-xen 6.0.0 ocaml-freestanding is used)
+  (#59, @hannesm)
+
 ## v0.2.1 (2020-05-09)
 
 - use constant-time selection in scalar mult (#51, @emillon)
