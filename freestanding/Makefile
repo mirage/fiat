@@ -12,7 +12,7 @@ else
 CC ?= cc
 FREESTANDING_CFLAGS := $(shell PKG_CONFIG_PATH=$(PKG_CONFIG_PATH) pkg-config --cflags ocaml-freestanding)
 DISCOVER_CFLAGS := $(shell sed 's/^(\(.*\))$$/\1/' ../p256/discover/cflags.sexp | tr -d '"')
-CFLAGS := -O3 $(DISCOVER_CFLAGS) $(FREESTANDING_CFLAGS)
+CFLAGS := -O3 -I../p256 $(DISCOVER_CFLAGS) $(FREESTANDING_CFLAGS)
 
 OBJS=p256_stubs.o
 
