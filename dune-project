@@ -1,4 +1,4 @@
-(lang dune 2.7)
+(lang dune 2.6)
 (generate_opam_files true)
 (name fiat-p256)
 (source (github mirage/fiat))
