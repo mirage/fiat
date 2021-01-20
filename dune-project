@@ -24,6 +24,7 @@
   hex
   (conf-pkg-config :build)
   (ppx_deriving_yojson :with-test)
+  (ppx_deriving :with-test)
   (rresult :with-test)
   (stdlib-shims :with-test)
   (yojson (and :with-test (>= "1.6.0"))))
