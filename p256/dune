@@ -1,7 +1,7 @@
 (library
  (name fiat_p256)
  (public_name fiat-p256)
- (libraries bigarray-compat cstruct eqaf.cstruct hex)
+ (libraries cstruct eqaf.cstruct hex)
  (foreign_stubs
   (language c)
   (names p256_stubs)

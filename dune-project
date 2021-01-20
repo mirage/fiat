@@ -17,7 +17,7 @@
   (alcotest :with-test)
   (asn1-combinators :with-test)
   (benchmark :with-test)
-  bigarray-compat
+  (ocaml (>= "4.08.0"))
   (cstruct (>= "3.5.0"))
   dune-configurator
   (eqaf (>= "0.5"))
