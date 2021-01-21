@@ -17,13 +17,14 @@
   (alcotest :with-test)
   (asn1-combinators :with-test)
   (benchmark :with-test)
-  bigarray-compat
+  (ocaml (>= "4.08.0"))
   (cstruct (>= "3.5.0"))
   dune-configurator
   (eqaf (>= "0.5"))
   hex
   (conf-pkg-config :build)
   (ppx_deriving_yojson :with-test)
+  (ppx_deriving :with-test)
   (rresult :with-test)
   (stdlib-shims :with-test)
   (yojson (and :with-test (>= "1.6.0"))))
