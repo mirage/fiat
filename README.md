@@ -1,3 +1,7 @@
+# Note
+
+This repository is deprecated and no longer maintained. A more comprehensive interfacing of fiat-crypto for OCaml is the [mirage-crypto-ec](https://github.com/mirage/mirage-crypto) package, please use that instead.
+
 # Fiat-p256
 
 `fiat-p256` contains primitives for ECDH key exchange algorithm over NIST curve P-256.
